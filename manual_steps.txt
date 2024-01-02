@@ -1,4 +1,5 @@
 git repo.
+git config --global core.autocrlf false # if it shows any working like : (warning: in the working copy of 'README.md', LF will be replaced by CRLF the next ti)
 
 echo "# networkclass" >> README.md
 git init
@@ -160,14 +161,35 @@ ifup and ifdown  ==> command to up and down interfaces
 netstat -rnv  ==> show us the ip route details with gateways nad mask
 tcpdump ==> command will show all input out from interface
 
+
+
+####  NIC Bonding ###################### 
+
+this is IMP topic PDF is attched along the doc to create NIC Bonding (Creating-NIC-Bonding.pdf)
+-- 	NIC : Network interface card
+
 -- NetworkManager TOOL : GUI, nmtui and nmcli
+
+we can create network bonding from below tools
 
 nmtui : provide UI for networkmanager to edit networke setting in terminal
 nmcli : refers to networkmanager command line interface with no UI
 nm-connection-editor : A full network graphical management tool . provide access to most of the NetworkManager configuration options
 GNOME settiogs :
 
-####  NIC Bonding ###################### 
+-------### nmcli ###--------------
 
-this is IMP topic PDF is attched along the doc to create NIC Bonding (Creating-NIC-Bonding.pdf)
--- 	NIC : Network interface card
+nmcli : command to update ip address or assign static ip address to interface
+-- nmcli device
+
+--  nmcli connection modify <interfaceid> ipv4.addresses <static IP>
+example :  nmcli connection modify wlp3s0 ipv4.addresses 192.168.1.52/24
+
+--  nmcli connection modify <interfaceid> ipv4.gateway <static IP>
+--  nmcli connection modify <interfaceid> ipv4.method <manual>
+--  nmcli connection modify <interfaceid> ipv4.dns <static IP>
+--  nmcli connection down <interfaceid>
+--  nmcli connection up <interfaceid>
+--  ip addr show <interface id>
+
+
