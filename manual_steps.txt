@@ -1,0 +1,173 @@
+git repo.
+
+echo "# networkclass" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/ajayparmar311/networkclass.git
+git push -u origin main
+
+linux commands :
+
+
+man | man -k 
+type
+which
+ncal
+date
+help
+pwd
+last
+
+https://github.com/mmumshad/kubernetes-the-hard-way
+
+this below  command will create a log file which will record current session activities 
+--- script testlog.log
+
+
+to update ssh port in firewall CMD below:
+sudo ufw allow ssh
+
+##below file is used to control user login defaults
+/etc/login.defs
+
+# to communicate with linux users we use below commands
+
+users -- to find out number of users logged into the machine
+wall --- to broadcast any msg to all the users
+write -- to write msg to any specific user (writer <username>)
+
+
+#### systemctl commands 
+
+systemctl start|stop|status|reload servicename.servicename
+
+to add service under systemctl management
+--- Create a unit file in : /etc/systemd/system/servicename.service
+
+To control system with systemctl
+		systemctl poweroff
+		systemctl halt
+		systemctl reboot
+		
+
+### Kill command 
+
+kill <PID>
+kill -1 <PID>  -- to restrt service
+kill -2 <PID>
+kill -9 <PID> -- forcefully kill the process
+kill -15 <PID> -- kill a process gracefully
+killall -- kill alll process
+pkill --kill process by it name
+
+
+
+to schedule any task we can use : 
+
+crontab -- to schedule for daily 
+at -- to schedule for single time
+
+
+
+#### process management #####################
+
+to run process in backgroud: 
+
+--- first run the commandn like : sleep 100
+--- then press control-z : that will stop the running process 
+--- you can check stopped process by ===   jobs ===== command 
+--- then you can put the process in backgroud by === bg === command
+--- if you want to bring back the same command in forground then type === fg ===
+
+To run a process in backgroud and also after closing the ternminal 
+--- we use === nohup ===  command 
+--- Example :  nohup sleep 100 > /dev/null 2>&1 &
+
+To run any process on priority
+--- we use === nice === command
+--- nice scale goes to -20 to 19  the lower number gets more priority 
+--- example : nice -n 5 process (nice -5 sleep 100)
+
+
+
+############## system monitoring command #################
+
+--- top 
+--- df  ==> disk partition details
+--- du  ==>file size
+--- dmesg ==> system related hardware and interpritor logs
+--- iostat ==> system disk input output reports 
+--- netstat ===>  netstat -rnv  - Print network connections, routing tables, interface statistics, mas‐querade connections, and multicast memberships (addition command :  ss, ip route, ip -s link, ip maddr)
+-- free ==> show us the phy memory 
+-- cat /proc/cpuinfo ==> gives us CPU info
+-- cat /proc/meminfo ==> gives us memory info
+
+################ Finding system information #################
+--- uname -a
+--- dmidecode 
+
+############ How to reset root passowrd ?  
+
+####### how to see environment veriable #################
+
+---printenv or env or export
+-how to set env 
+--- export name=ajay
+--- echo $name
+
+--- to set env we can update values in our home dir hidden file .bashrc
+---  OR to set veriable globally we can use file ==> /etc/profile or /etc/bashrc
+
+
+
+
+###### Set special permission this will only work on C program executable #######
+
+-- to add or remove special permissions at the user level
+setuid ===> chmod u+s xyz.sh
+			chmod u-s xyz.sh
+			
+setgid ===> chmod g+s xyz.sh
+			chmod g-s xyz.sh
+			
+-- To find all setuid and setgid in linux
+find / -perm /6000 -type f
+
+############ asigne sticky bit to dir to protect it from deleteing by any other user if that dir has all permission 777 example /tmp dir in / (root)
+
+chmod +t xyz
+
+####################### Network Switch ############################
+
+-- to find network interfaces 
+   -- lshw -class network
+-- interface detection
+-- Assigning an IP address
+-- interface configuration files
+	- /etc/nsswitch.conf     ==> where it should resolve its host addr to ip address
+	- /etc/host
+	- /etc/sysconfig/network ==> in RHEL to set static ip
+	- /etc/netplan/01-network-manager-all.yaml==> in ubuntu to change staticip
+	- /etc/sysconfig/network-scripts/ifcfg-nice
+	- /etc/resolve.conf ==> DNS entry
+
+------ network commands------
+ping <host ip> ==> is to test host connectivity
+ifconfig   ==> to check interfaces details 
+ifup and ifdown  ==> command to up and down interfaces
+netstat -rnv  ==> show us the ip route details with gateways nad mask
+tcpdump ==> command will show all input out from interface
+
+-- NetworkManager TOOL : GUI, nmtui and nmcli
+
+nmtui : provide UI for networkmanager to edit networke setting in terminal
+nmcli : refers to networkmanager command line interface with no UI
+nm-connection-editor : A full network graphical management tool . provide access to most of the NetworkManager configuration options
+GNOME settiogs :
+
+####  NIC Bonding ###################### 
+
+this is IMP topic PDF is attched along the doc to create NIC Bonding (Creating-NIC-Bonding.pdf)
+-- 	NIC : Network interface card
