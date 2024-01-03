@@ -24,13 +24,32 @@ https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewal
 
 linux commands :
 
+----- how to search installed packages in linux
+--- For RHEL : 
+	-- How to list all installed : rpm -qa
+	-- How to install from yum : yum install <package name>
+	-- how to install pkg from rpm : rpm -hiv <rpm file>
+	-- how to uninstalled pkg from rpm  :  rpm -e <installed package name>
+	-- to clean cache : yum clean all
+	-- to check all repo : yum repolist all
+	-- To check information of the package : rpm -qi <package name>
+	-- to check config file details of the pkg : rpm -qc <package name>
+	-- find the pkg name from the command : which <CMD> | rpm -qf
+	-- how to get the <id>  for the below command : yum history
+	-- Undo the installed package : yum history undo <id>
+	-- update command will preserve the old package : yum update
+	-- upgrade will delete old version or the obsolate package : yum upgrade
+--- For DEB : 
+	-- How to list all installed : apt list --installed
+	-- how to install from rpm : rpm -hiv <rpm file>
+
 ########  To check for all version of any command 
 --- snap info <CMD name>
 example : snap info curl
 
 man | man -k 
 type
-which
+which <command name>
 ncal
 date
 help
