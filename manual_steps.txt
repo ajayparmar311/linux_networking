@@ -9,8 +9,24 @@ git branch -M main
 git remote add origin https://github.com/ajayparmar311/networkclass.git
 git push -u origin main
 
+
+######## WEbsites for linux related commands  ###############
+
+-- to install any server on linus deb or RHEL
+https://www.server-world.info/en/note?os=Ubuntu_20.04&p=ftp&f=4
+
+-- firewalld related commands
+
+https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewall-settings
+
+
+#####################################################################
+
 linux commands :
 
+########  To check for all version of any command 
+--- snap info <CMD name>
+example : snap info curl
 
 man | man -k 
 type
@@ -160,6 +176,7 @@ ifconfig   ==> to check interfaces details
 ifup and ifdown  ==> command to up and down interfaces
 netstat -rnv  ==> show us the ip route details with gateways nad mask
 tcpdump ==> command will show all input out from interface
+nslookup <path or ip address> ==> lookup DNS server entry of the given domain
 
 
 
@@ -180,7 +197,8 @@ GNOME settiogs :
 -------### nmcli ###--------------
 
 nmcli : command to update ip address or assign static ip address to interface
--- nmcli device
+-- nmcli device status  ## is to check all interfaces status on device
+-- nmcli connection show  -active  ## is to check active interfaces
 
 --  nmcli connection modify <interfaceid> ipv4.addresses <static IP>
 example :  nmcli connection modify wlp3s0 ipv4.addresses 192.168.1.52/24
@@ -191,5 +209,48 @@ example :  nmcli connection modify wlp3s0 ipv4.addresses 192.168.1.52/24
 --  nmcli connection down <interfaceid>
 --  nmcli connection up <interfaceid>
 --  ip addr show <interface id>
+
+### add secendory static ip
+-- nmcli connection modify <interface name> +ipv4.addresses <secondary ip>
+-- nmcli connection reload
+-- systemctl reboot
+-- ip addr show
+
+
+################ rsync command ###########################
+
+rsync - a fast, versatile, remote (and local) file-copying tool 
+mainly used for backup and mirroring.
+
+---- inatall rsync ------
+RHEL : yum -y install rsync
+DEB : apt -y install rsync
+
+port: 22 (same as SSH)
+
+---- sync a file on a local machine 
+-- create a backup file 
+tar cvf backup.tar .
+-- create a backup folder 
+mkdir /tmp/backup
+-- rsync CMD
+- syntex :  rsync -zvh <backup file> <backup destination path>
+rsync -zvh backup.tar /tmp/backup/
+
+---- sync a dir on local machine
+-- rsync CMD 
+- syntex :  rsync -azvh <backup source dir path> <backup destination dir path>
+rsync -zvh /home/ajay/ /tmp/backup/
+
+---- sync a file to remote machine
+-- rsync CMD 
+- syntex :  rsync -azvh <backup file> remoteuser@<ip>:<remote destination dir>
+rsync -avz backup.tar ajay@192.168.1.51:/home/ajay/
+
+
+---- sync a file from remote machine
+-- rsync CMD 
+- syntex :  rsync -azvh  remoteuser@<ip>:<remote dir> <local machine dir>
+rsync -avz ajay@192.168.1.51:/home/ajay/nohup.out /home/ajay/
 
 
