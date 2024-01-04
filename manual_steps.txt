@@ -9,6 +9,16 @@ git branch -M main
 git remote add origin https://github.com/ajayparmar311/networkclass.git
 git push -u origin main
 
+################ user management #######################
+
+chage <username>
+chage -l <username>
+/etc/login.defs  ---- default setting for users
+/etc/pam.d/system-auth  --------need to check
+
+
+
+
 
 ######## WEbsites for linux related commands  ###############
 
@@ -19,6 +29,9 @@ https://www.server-world.info/en/note?os=Ubuntu_20.04&p=ftp&f=4
 
 https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewall-settings
 
+#################### Download repository ###################
+
+sudo yum install epel-release
 
 #####################################################################
 
@@ -55,6 +68,8 @@ date
 help
 pwd
 last
+netstat -tunlp // show all the open port
+stat <filename>  // this command will show status of the file
 
 https://github.com/mmumshad/kubernetes-the-hard-way
 
@@ -273,3 +288,78 @@ rsync -avz backup.tar ajay@192.168.1.51:/home/ajay/
 rsync -avz ajay@192.168.1.51:/home/ajay/nohup.out /home/ajay/
 
 
+################ DNS SETUP ####################
+refer PDF doc : 3-DNS.pdf from git : 
+
+1 -- Install DNS package 
+yum install bind bind-utils -y
+
+
+
+to update dns entry in client :  https://infotechys.com/change-dns-settings-using-the-nmcli-utility/
+
+nmcli connection modify enp0s3 ipv4.dns "192.168.56.11"
+
+#################   NTP (Network Time Protocol) / chronyd #################
+
+NTP port : 123
+yum install ntp
+yum install chrony
+
+##################  timedatectl #########
+
+timedatectl command shows/change date , time and timezone 
+it synz time with NTP server also  
+------- commands
+-- timedatectl
+	To list timezone
+-- timedatectl list-timezone
+   To set timezone
+-- sudo timedatectl set-timezone "Asia/Kolkata"
+   to set date 
+-- sudo timedatectl set-time YYYY-MM-DD 
+   to set auto time sync with remote NTP server
+-- timedatectl set-ntp true
+
+################### sendmail ######################
+
+ send and recive emails
+-- files 
+	/etc/mail/sendmail.mc
+	/etc/mail/sendmail.cf
+	/etc/mail
+	
+-- service 
+	systemctl start sendmail
+
+-- command 
+	mail -s "subject line" <emailadd@xyz.com>
+
+################ httpd ######################
+
+-- Files 
+	/etc/httpd/confg/httpd.conf
+	/var/www/html/index.html
+-- logs
+	/var/log/httpd/
+
+#################### rsyslog ###############
+
+-- Generate log or collect logs from other servers
+-- service or pkg name : rsyslog
+-- config file : /etc/rsyslog.conf
+-- service :
+	systemctl start rsyslog
+	systemctl enable rsyslog	
+	
+#################### Server hardening #######################
+
+- user Account 
+- remove un-wanted pkg
+- stop un-used services : systemctl -a (check for active and inactive srvc)
+- check on listening port : netstat -tunlp
+- secure ssh configuration : /etc/ssh/sshd_config
+- enable firewall : /etc/firewalld/firewalld.conf
+- enable SELinux : sestatus :  /etc/sysconfig/selinux : stat <filename>
+- change listebing services port number
+-keep your OS up to date (security patching)
