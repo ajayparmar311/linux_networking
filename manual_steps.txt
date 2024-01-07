@@ -25,9 +25,7 @@ chage -l <username>
 -- to install any server on linus deb or RHEL
 https://www.server-world.info/en/note?os=Ubuntu_20.04&p=ftp&f=4
 
--- firewalld related commands
-
-https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewall-settings
+ 
 
 #################### Download repository ###################
 
@@ -68,8 +66,12 @@ date
 help
 pwd
 last
+netstat -rvn // show gateway details
 netstat -tunlp // show all the open port
+ss -napt // utility to investigate socket
 stat <filename>  // this command will show status of the file
+host - DNS lookup utility
+
 
 https://github.com/mmumshad/kubernetes-the-hard-way
 
@@ -363,3 +365,191 @@ it synz time with NTP server also
 - enable SELinux : sestatus :  /etc/sysconfig/selinux : stat <filename>
 - change listebing services port number
 -keep your OS up to date (security patching)
+
+
+####################### SSH ############################
+
+Configure idel timeout interval
+Avoid having and unattened SSH session , we can set an idel timeout interval
+
+- Become root
+- edit : /etc/ssh/sshd_config file and add following line
+	ClientAliveInterval 600
+	ClientAliveCountMax 0
+systemctl restart sshd
+
+-----#### Disable root login ####---------
+
+This should be done at the initial time of setting system
+
+- become root
+- edit : /etc/ssh/sshd_config file and replace PermitRootLogin yes to no
+- PermitRootLogin no
+-systemctl restart sshd
+
+-----#### Disable empty password ####---------
+
+We need to prevent remote logins from accounts with empty passwords for added security
+
+- become root
+- edit : /etc/ssh/sshd_config file and uncomment following lines
+- PermitEmptyPassword no
+-systemctl restart sshd
+
+
+-----#### Limit user's SSH access ####---------
+
+We should limit our SSH logins to only certain users who need remote access
+
+- become root
+- edit : /etc/ssh/sshd_config file and add below line
+- AllowUsers <user1> <user2> .....
+-systemctl restart sshd
+
+
+-----#### Use a diffrent port for SSH ####---------
+
+By default SSH port runs on 22. Most hackers looks for any open SSH server with port 22 and changing default port can make system much more secure.
+
+- become root
+- edit : /etc/ssh/sshd_config file and change
+- Port 22 // this is a default setting change this to any uavailable port 
+-systemctl restart sshd
+
+
+
+------ $$$$$$$ Access remote server without password $$$$$$$ ------
+=>  Two reasons to access a remote machine
+	- Repetitive logins
+	- Automation through scripts
+	
+=>	Keys are generated at user level
+	- <vagrant> : user level
+	- root level
+
+=> First we generate keys at clinet side and share that auth keys to server side
+	- CMD to generate keys : 
+		-- ssh-keygen
+	- CMD to copy keys to server  
+		-- sh-copy-id <user>@<serverip>
+	- cmd to login from client to server
+		-- ssh <server-user>@<server-ip>
+		-- ssh -i <server-user> <server-ip>
+	
+
+#########   cockpit ##############
+
+server administration tool with web based interface
+
+-- check if it exist : 
+	- rpm -qa | gre -i cockpit
+-- Install if not exist :
+	- yum/dnf/apt-get install cockpit 
+-- Start service 
+	-  systemctl start cockpit
+-- check the status 
+	- systemctl status cockpit
+-- Access the web interface : 9090 is default port for cockpit
+	- http://<server-ip>:9090
+
+
+
+#################  Firewall ##############################
+
+-- There are two tools to manage firewall 
+	- iptables 			: comes in older linux versions and still in use
+	- firewalld			: newer version came from centos 7 and above
+
+========>>>> 1. WORKING WITH iptables
+
+-- before working with iptables. make sure to disable and stop firewalld if it is running.
+	- service OR systemctl stop firewalld
+	- systemctl disable firewalld
+	- systemctl mask firewalld : to prevent it from running byother program
+
+-- now check if we have iptables-serices package installed:
+	- rpm -qa | grep -i iptables-services
+	- IF above package is not installed the install it 
+		-  yum install iptables-services
+	- Then start and enable iptables services
+		- systemctl start iptables
+		- systemctl enable iptables
+	- Now you can check iptables rule
+		- iptables -L
+	- To flush iptables.
+		- iptables -F
+---------------------------------------------------------------------------
+
+========>>>> 2. WORKING WITH firewalld
+
+-- link to firewalld related commands
+https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewall-settings
+
+-- firewalld command : firewall-cmd
+
+-- firewalld also has the following :
+	- table		: contains all in of chains rules and targets		
+	- chains	: contains INPUT, FORWORD ,OUTPUT target for information
+	- rules		: 
+	- targets	: DROP, REJECT OR EXCEPT the information
+
+--	make sure to stop,disable and mask iptables service
+	- systemctl stop iptables
+	- systemctl disable iptables
+	- systemctl mask iptables
+
+-- check if firewalld pkg is present and installed or not
+	-  rpm -qa | grep -i firewalld
+
+-- start and enable firewalld service
+	- systemctl start firewalld
+	- systemctl stop firewalld
+
+-- check firewalld rules
+	-  firewall-cmd --list-all
+
+-- get the list of all services firewalld is aware of:
+	-  firewall-cmd --get-services
+	- To get specific service:
+		- firewall-cmd --get-services  | awk '{for(i=1 ;i < NF ; i++) {if($i=="ssh")print $i,NF}}'
+-- to make firewalld reload it config
+	- 	firewall-cmd --reload
+-- To get the multiple zone
+	- 	firewall-cmd --get-zone
+-- To get active zone:
+	- 	firewall-cmd --get-active-zones
+-- All services are pre-defind by firewall. what if we want to add 3rd party service.
+	- /usr/lib/firewalld/services/ : in this folder you will get all the default serice xml files (Individual files)
+	- you can copy any file from the existing .xml file and can create new files
+	- default xml file format :
+		<?xml version="1.0" encoding="utf-8"?>
+		<service>
+		<short>SSH</short>
+		<description>To login </description>
+		<port protocol="tcp" port="22"/>
+		</service>
+		-	RESTART firewalld : systemctl restart firewalld
+	-  To add and remove service to firewall :
+		-	firewall-cmd --add-service=<service-name defined in xml file>
+		-	firewall-cmd --remove-service=<service-name defined in xml file>
+		- 	EACH TIME WHEM YOU ADD OR REMOVE SERCVICE YOU NEED TO RELOAD 
+			-	firewall-cmd --reload
+	-  To add and remove service to firewall :
+		-	firewall-cmd --add-service=<service-name defined in xml file> --permanent
+		-	firewall-cmd --remove-service=<service-name defined in xml file> --permanent
+		- 	EACH TIME WHEM YOU ADD OR REMOVE SERCVICE YOU NEED TO RELOAD 
+			-	firewall-cmd --reload
+	-  TO ADD PORT :
+		-	firewall-cmd --add-port=<port>/tcp
+		-	firewall-cmd --remove-port=<port>/tcp
+	-  TO REJECT INCOMING TRAFIC FROM AN IP ADDRESS :
+		- firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.1.51" reject'
+	-  TO BLOCK AND UNBLOCK ICMP INCOCMING TRAFIC
+		- firewall-cmd --add-icmp-block-inversion
+	-  TO BLOCK OUTGOING TRAFIC TO SPECIFIC WEBSITE/IP ADDRESS :
+		- first get the IP address :
+			- host -t a www.facebook.com
+		- to add : 
+			sudo firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -d 163.70.143.35 -j DROP
+		- To remove :
+			sudo firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 0 -d 163.70.143.35 -j DROP
