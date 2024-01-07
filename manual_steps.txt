@@ -58,7 +58,9 @@ linux commands :
 --- snap info <CMD name>
 example : snap info curl
 
+
 man | man -k 
+apropos <string or command> : apropos - search the manual page names and descriptions
 type
 which <command name>
 ncal
@@ -553,3 +555,83 @@ https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewal
 			sudo firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -d 163.70.143.35 -j DROP
 		- To remove :
 			sudo firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 0 -d 163.70.143.35 -j DROP
+
+###############  Tune System performance #####################
+-- Check if the tuned pkg is installed or not 
+	-  rpm -qa | grep -i tuned
+-- if not install the service :
+	-  yum install tuned
+-- stert and enable the service:	
+	-	systemctl start tuned
+	-	systemctl enable tuned
+-- command to change setting of tuned daemon
+	- tuned-adm
+-- To check which profile is active
+	- 	tuned-adm active
+-- to list availabe profile
+	-	tuned-adm list 
+-- To chenge to desired profile:
+	-	tuned-adm profile <profile-name>
+-- check for tuned recommendation :
+	-	tuned-adm recommend
+-- turn off tuned setting daemon
+	-	tuned-adm off
+-- change profile through web console :
+	-	login to https://<ipaddr>:9090		==> cockpit web app console
+	-	Go to :	overview  ==> configuration  ==> performance profile
+	
+-- we can set priority manually by nice and renice command
+	- TO set the process priority:
+		- nice -n <number of priority B/W -20(hightest) to 19> <process name>
+	- To change the process priority:
+		- renice -n <no. of priority B/W -20(hightest) to 19> <process name>
+-- Process priority can be viewed through ps CMD given below
+	-	ps axo pid,comm,nice,cls --sort=-nice
+
+
+##################  Kickstart (automate linux installation) #################
+
+-- To use kickstart you must use: 
+	- choose a kickstart server and create/edit kickstart file
+	- make the kickstart file availabe on the network location
+	- make the installation source availabe
+	- make boot media available for client which will be used to begin   	installation	
+	- start the kickstart installation
+-- CentOS / RedHat :
+	- kickstart program can be downloaded which allows you to define parameters through the gui.
+		- yum install system-config-kickstart <this will not work in RHEL 8 and above>
+	- or you can use the installation kickstart file .which was created during the first installation
+		- anaconda-ks.cfg
+
+--	WE will use anaconda-ks.cfg installation kickstart file and make the nesessory changes
+
+-- make sure httpd pkg is installed . if not then install the pkg 
+	- rpm -qa | grep -i http
+	- yum/dnf install httpd
+	- systemctl start httpd
+	- systemctl enable httpd
+
+-- copy anaconda-ks.cfg file to httpd folder
+	- cp /root/anaconda-ks.cfg /var/www/html/
+	- set the read permission:
+		- chmod a+r /var/www/html/anaconda-ks.cfg
+	- add httpd port 8080 inti firewall
+	- check SELinux : sestatus
+	- check file through browser : http://<serverip>/anaconda-ks.cfg
+
+############### DHCP (dynamic hostname configuriton protocol) ########
+
+we can create centOS machine(server) as an DHCP server
+
+-- install DHCP server pkg 
+	- for centOS 7 : 
+		- yum install dhcp
+	- For centOS 8 and above :
+		- yum install dhcp-server
+-- edit the config file :
+	- vim /etc/dhcp/dhcp.conf
+	- OR we can copy it from :
+		- cp /usr/share/doc/dhcp-x.x.x/dhcpd.conf.example /etc/dhcp/dhcp.conf
+-- Then start and enable the service :
+	- systemctl start dhcpd
+	- systemctl enable dhcpd
