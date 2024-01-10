@@ -151,6 +151,12 @@ psacct ===> psacct or acct both are open source utilities for monitoring usersâ€
 		-	 rpm -qa | grep -i yum-utils
 	-	if not installed Then install it :
 		-	yum install yum-utils
+-- Get list of all orphan package:
+	-	package-cleanup --leaves
+-- to remove all orphan pkg :
+	-	yum remove `package-cleanup --leaves` (RHEL)
+	-	apt-get autoremove
+	
 		
 
 
@@ -854,27 +860,101 @@ Need to go through again
 	- we can modify the settings for permanent to edit /home/user/.bashrc file
 	
 
+#######################################################
+####################### NGINX #########################
+#######################################################
+
+What is NGINX : 
+	- is web server :
+		- server web context
+	- can also servers as Reverse proxy server
+		- Load Balancing
+		- Backend routing
+		- Caching
 	
 	
 	
+#######################################################
+########## SSL / TLS Certification ####################
+#######################################################
+
+SSL : secure socket layer (RFC) 1994
+TLS : Transport layer Security 1999 : TLS based on SSL / or upgraded SSL (RFC2246)
+
+
+-- Why do we need SSL certificates ?
+
+	1.	Source identity Verification
+	2.	Security against Man-in-the-middle (MITM)
+	3.	Client/Server authentication
+	4.	Non-Repudiation
+
+-- How SSL WORK ?
+	1. CA(certificate Authority(ex. Godaddy,symanter)) publishes its root certificate (Public certificate) To all browser vendors (ex, Google chrome,Mozila)
+	2  CA's Root certificate(public certificate) then distributed as part of the browser application.
+	3.	Me who want SSL can geneterate my ssl certificate and send that to CA for authentication by creating signing request to CA once CA sign the request . it will shared signed public and private certificate. which can be used as SSL/TLS cert.
+	4. client request for the website or SSL/TLS handshaking.
+	5. Client server will share SSL certificate for the website to the client.
+	6. client will verify that SSL certificate by doing lookup with the appropriate CA Root certificate (public key).
+	
+-- Encryption algorithms:
+	- Obsolate
+		- DES (Symmetric)
+		- 3DES (Symmetric)
+	- Modern
+		- AES (Symmetric)
+		- RSA (Asymmetric)
+		
+	
+-- Hash ==> Hash verifies the integrity of data.
+	1. like on data you apply hash function and create hash value then you send data+hash value to reciver.
+	2. on reciver side data+hash recived and data is removed from hash+data. Then hash funtion apply on data and create the hash value. that hash value then compaired with the hash value shared by sender and caompaired for data integrity.
+	3. if both hash value matched then we can assume that data is protected and not hamperd in transit.
+	
+-- Hashing algorithms:
+	- MD5 (128 bit) : used for password integrity in transit
+		-	md5sum file.txt
+	- SHA
+		- SHA-1 (160 bit)
+			-	sha1sum file.txt
+		- SHA-256 (256 bit)
+			-	sha256sum file.txt
+		- SHA-512 (515 bit)
+			-	sha512sum file.txt	
+	- HMAC (can be used MD5 and SHA)
+
+-- Asymmetric Keys 
+	- private keys : kept private at owner side 
+	- public keys  : can be shared with anyone
+-- How we can use it ?
+	1. for encreption of data 
+		- Sender can encrypt data in with public key and owner can decypt the data with provate key 
+	2. For signing and verifying signature.
+		- Owner can create a hash from the data and then encrypt that hash with private key and then can send data+encrypted-hash to reciver,
+		- Reciver will recive the data+encrypted-hash and seperate data and encpypted-hash, Then Encypt the data with hash function and decrpted the encpypted-hash wtih public key from the owner and verify and authenticate the data.
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+-- RSA (Asymmetric) : Public-key Cryptosystem
+	- Key length or RSA key both public and private is B/W :
+		- 1024
+		- 2048 - mainly used
+		- 2072
+		- 4096
+
+-- PKI (Public Key Infrastructure)
+
+
+-- What information an Certificate holds.
+	- Information about owner
+	- information about issuer
+	- Signature		==> Signature is Encrypted with private key of CA with hash of certificate
+	- public key  ==> public key in certificate ALWAYS belongs to owner of certificate
+
+
+-- openssl CMD	
+	- To generate RSA key:
+		- openssl genrsa // with no encryption
+		- openssl genrsa -aes256	// with AES265 encryption
 	 
 	
 	
