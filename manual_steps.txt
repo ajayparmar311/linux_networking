@@ -74,6 +74,88 @@ ss -napt // utility to investigate socket
 stat <filename>  // this command will show status of the file
 host - DNS lookup utility
 
+----- %%%% check processing issue %%%%%--------
+
+####### LOG ###
+
+-- /var/log/secure
+	-	This file contains the user login and exit details along with remote client address
+	- Like : Accepted password for ajay from 192.168.1.19 port 63142 ssh2
+-- /var/log/audit/audit.log
+	- contains systemd audit . like service start stop . user login exit audit log
+-- /var/log/messages
+	- contain system session logs . login session log
+-- /var/log/wtmp
+	-	Also holds the login details 
+
+
+df -hv | grep -v tmpfs
+du -a OR du -h OR du -ah / OR du -ah <dir-path>  ==>> to get file zise
+free -m	: free - Display amount of free and used memory in the system
+top : top - display Linux processes
+lsmem : lsmem - list the ranges of available memory with their online status
+/proc/meminfo    ===>> memory info file 
+vmstat ==> vmstat - Report virtual memory statistics
+pmap <process-id> ===> report memory map of a process
+dmidecode ===>  dmidecode - DMI table decoder
+lscpu  OR /proc/cpuinf ===> display information about the CPU architecture
+
+----- %%%% check disk issue %%%%%--------
+iostat -y 5 ===> Report Central Processing Unit (CPU) statistics and input/output statistics for devices and partitions.
+lsof ===> list open files
+
+----- %%%% check networking issue %%%%%--------
+
+-- ifconfig	===> all interfaces status 
+-- ethtool <interface-id> =====> ethtool - query or control network driver and hardware settings
+-- mii-tool enp0s3  ===>  mii-tool - view, manipulate media-independent interface status
+--  ifup <interface-id> and ifdown <interface-id>  ==> command to up and down interfaces
+-- configuration files for network :
+	-	/etc/NetworkManager/system-connections/
+-- systemctl restart network
+
+
+tcpdump -i <interface-id like:enps03> ===> dump traffic on a network
+
+lsof -i -P -n | grep -i listen   ==> listining sockets / listning port to check if our machine is listning on specific port or not 
+
+netstat -plnt ==>  netstat  - Print network connections, routing tables, 
+interface statistics, masquerade connections, and multicast memberships
+
+ss -plnt  ===> ss - another utility to investigate sockets
+
+iftop  ===> iftop - display bandwidth usage on an interface by host
+		please install it :
+			-	yum install epel-release
+			-	yum install iftop
+
+----- %%%% check check other tools %%%%%--------
+
+htop, pcp-htop =====>>> interactive process viewer
+iotop ===> simple top-like I/O monitor
+iptraf-ng ====> IPTraf is a console-based network monitoring utility. IPTraf gathers data like TCP connection packet and byte counts, interface statistics and activity indicators, TCP/UDP traffic breakdowns, and LAN station packet and byte counts. iptraf-ng is a fork of iptraf.
+psacct ===> psacct or acct both are open source utilities for monitoring users’ activities on the Linux system. These utilities run in the background and keep track of each user’s activity on your system as well as what resources are being consumed.
+
+----- %%%% remove unnecessoary or orphan package %%%%%--------
+
+-- To get list of all package :
+	-	rpm -qa | grep -i <packagename> (centos/RHEL)
+	-	apt list --installed | grep -i <package-name> (ubuntu)
+
+-- To delete package:
+	-	rpm -e <package-name>
+	-	apt-get remove <package-name>
+	
+-- built-in utility <yum-utils> whhich allows you to check for orphaned pkg
+	-	check if that utility is installed in or not.
+		-	 rpm -qa | grep -i yum-utils
+	-	if not installed Then install it :
+		-	yum install yum-utils
+		
+
+
+
+
 
 https://github.com/mmumshad/kubernetes-the-hard-way
 
@@ -195,6 +277,13 @@ find / -perm /6000 -type f
 chmod +t xyz
 
 ####################### Network Switch ############################
+
+---------- %%%%%%% Network commands %%%%%%% -------------
+
+ifconfig   ===> to check all interfaces details
+ifdown <interface-id>  ===> to disable interface
+---- Restart network service
+systemctl restart network.service
 
 -- to find network interfaces 
    -- lshw -class network
@@ -635,3 +724,161 @@ we can create centOS machine(server) as an DHCP server
 -- Then start and enable the service :
 	- systemctl start dhcpd
 	- systemctl enable dhcpd
+	
+
+################  SYSTEM RUN LEVEL ########################
+
+in linux we have 6 system run level.
+
+-- main run level.
+	- init 0  ==> Shutdown or halt the system
+	- init 1 (init s OR S)  ==> single user mode , usually alised as s or S
+	- init 6  ==> reboot the system
+-- Other run level
+	- init 2  ==> multiuser mode without networking
+	- init 3  ==> multiuser mode with networking
+	- init 5  ==> multiuser mode with networking and GUI
+	
+-- commend to check with run level are you currently in :
+	-	 who -r
+	
+################# Computer boot process ######################
+
+BIOS : basic input and output system
+BIOS installed on ROM
+CMOS : complementoy metal-oxide semiconductore : CMOS has BIOS settings including systemtime,date as well as hardware setting
+POST : Power on self test ==> this will test all system hardware part. if those are running or not 
+DISK block MBR (Master boot record) : this has information of the OS.
+---------- The above whole process is called as bootstrap -------------
+
+################# linux boot process ######################
+
+------------ %%%%% OLD linux BOOT Process %%%%% -------------
+
+when we press power button to start computer : 
+it first goes to BIOS and run bios process and execute MBR ====> then MBR(which is a first block of HDD) which execute GRUB ====> GRUB is (Grand Unified BootLoader) which loads the kernel (config file path /boot/grub/grub.com) and execute kernel  ====> kernel executes /sbin/init program ====> init execute runlevel programs (0,1,2,3,5,6) ====> run level programs are executed from /etc/rc.d/rc*.d
+
+--	for newer version of linux runlevel settings are defined as :
+	-	path : /etc/systemd/system/default.target
+	-	To set new default run-level run:
+		-	systemctl set-default <new target>
+	-	Older version of linux = /etc/inittab
+	
+------------ %%%%% New linux BOOT Process %%%%% -------------	
+
+when we press power button to start computer : 
+--
+it first goes to BIOS and run bios process and POST(power-on-self-test) and execute MBR ====> then MBR(which is a first block of HDD) which execute GRUB2 ====> GRUB2 is (Grand Unified BootLoader v2) which loads the kernel (config file path /boot/grub2/grub.cfg) and execute kernel  ====> kernel(core of operating system) loads required drivers from initd.ing then  /sbin/init -> ../lib/systemd/systemd  start the first OS program(systemd) ====> systemd=(system daemon (PID #1)) : it then start all the required processes , which reads /etc/systemd/system/default.target to bring the system to run-level Total of 7 run-level (0 to 6) 
+	
+
+##################### Message of the day #############################
+--	File Location 
+	-	/etc/motd
+	-	you can change it as per your notic:
+		- vim /etc/motd
+
+-- Customize message of the day :
+	1 - create new file in /etc/profile.d/
+		-	/etc/profile.d/motd.sh
+	2 - modify the /etc/ssh/sshd_config file to edit
+		-	#PrintMotd yes to PrintMotd no
+	3 - Restart sshd service	
+		-	systemctl restart sshd.service
+	
+	
+#################### Computer storage #########################
+
+Type of computer storage:
+	- Local storage : RAM,HDD,SSD
+	- DAS (Direct Attched Storage) :  CD ,DVD,flash drive
+	- SAN (Storage Area Network)
+		- storage attched through iSCSI or fible cable
+	- NAS (Network attached Storage)
+		- Storage attached over network(TCP/IP)
+		- Example : SAmba,NFS etc
+
+-------------%%%%%%%% DISK Partition %%%%%%%%%-------------------
+
+-- df - report file system disk space usage
+	- df -h 
+-- fdisk - manipulate disk partition table
+	- fdisk -l
+-- you can add the disk space and check with ==> fdisk -l
+-- you can now add the disk like : if disk name is : /dev/sdb then type :
+	-	fdisk /dev/sdb ==> then follow the instruction
+-- Now partition has been created like /dev/sdb1, now you can assign file system type
+	-	mkfs.xfs /dev/sdb1
+-- Now we will mount the partition on any mouth path:
+	-	first create the mount path in root(or anywhere)
+		-	mkdir <dir-name>
+	-	Then mount that create dir to partition(or use existing one)
+		-	mount <partition-name> <mount-path>
+			example : mount /dev/sdb1 /data
+	-	Now we can check the partition mount path 
+		-	df -h
+--  to auto mount the partition at boot time
+	-	check file /etc/fstab which has all the entry about partition
+		-	/etc/fstab
+	-	Edit the file and add new partition details
+		- vi /etc/fstab
+-- To unmount the mount path :
+	-	umount <mount-path>
+		example : umount /data_ajay
+-- reload /etc/fstab file to reload the config.
+	- mount -a
+	
+-- How to format partission
+	-- umount the partition from mount path then run below command:
+		-	fsck <partition> / e2fsck <partition>
+			example :  fsck /dev/sdb1
+
+-------------%%%%% LVM (logical volume management) %%%%%%%%%--------------
+
+
+
+Need to go through again
+
+
+
+-------------%%%%% implement advanced storage features %%%%%%--------------
+
+
+	
+	
+
+############ Change file creation permission ################
+
+-- CMD :
+	- umask : CMD to set default  permission of any newly created file/dir
+	- umask u+rw,g+r,o-rwx
+	- we can modify the settings for permanent to edit /home/user/.bashrc file
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	 
+	
+	
+	
+
+
+
