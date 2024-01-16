@@ -59,6 +59,9 @@ linux commands :
 example : snap info curl
 
 
+
+
+curl -I http://192.168.1.25/index.html
 man | man -k 
 apropos <string or command> : apropos - search the manual page names and descriptions
 type
@@ -73,6 +76,12 @@ netstat -tunlp // show all the open port
 ss -napt // utility to investigate socket
 stat <filename>  // this command will show status of the file
 host - DNS lookup utility
+systemctl list-units | grep -i firewall   ==> to search service in systemd
+
+lscpu  ==> to get system details like no of CPU mem, sockets etc
+nproc  ===> give number of processor
+
+ulimit -n	==> To check open file limit 
 
 ----- %%%% check processing issue %%%%%--------
 
@@ -927,8 +936,31 @@ statically from the source with nginx by using --with-pcre=<path> option.
 					- systemctl enable nginx
 					
 		-- Configuration terms : 
+			- To get current nginx build argument:
+				- nginx -V
 			- to test if configuration is correct or not ;
 				- nginx -t
+			- HTTP response status code url:
+				- https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+			- vvariable: https://nginx.org/en/docs/varindex.html
+				- example : set $<veriableName> <veriableValue> ;
+			- buffers and timeout :
+				URL : https://nginx.org/en/docs/syntax.html
+				
+		-- WE can upgrade the NGINX or add or remove module 
+			- first we will check the exsisting configuration command by : 
+				- nginx -V : this CMD will give us the exsisting configuration list
+			- then we can check the module list (cd into source folder) :
+				- ./configure ./configure --help | grep -i <the module you want to search>
+			- then we will add thet module in the existing configuraion CMD and will also add the module config path like below 
+				- ./configure <exesing config module> --with-http_image_filter_module --modules-path=/etc/nginx/modules
+					- in above CMD --with-http_image_filter_module is the new module added
+					- --modules-path=/etc/nginx/modules module path added 
+				- once this is done hit enter , It will also ask for dependend packages,install the dependent packages 
+				- once all dependancy installed the hit :
+					- make
+					- make install
+				- this will not change existing configuration . only add the new module
 				
 			
 	
