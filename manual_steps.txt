@@ -871,7 +871,66 @@ What is NGINX :
 		- Load Balancing
 		- Backend routing
 		- Caching
-	
+
+-- Install NGINX
+	- yum install nginx
+	- NGINX configuration file:
+		- /etc/nginx/nginx.conf
+		
+-- Link for NGINX source code :
+	- https://nginx.org/en/download.html
+	- Installation steps : 
+		- https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
+	- wget the stable version of source code Then unzip that.
+	- then we will execute ./configure scrip to configure over source code for build
+		- ./configure
+			-- IF you get error like : ./configure: error: C compiler cc is not found, Then we will install c compiler	
+			-- yum groupinstall "Development Tools"   ==> for centos/RHEL
+			-- apt-get install build-essential		  ==>  For Ubuntu/DEB	 
+			-- now agin test the script 
+				- ./configure
+			-- if you get below WORNING then we need some dependancy packages,
+				- ./configure: error: the HTTP rewrite module requires the PCRE library.
+You can either disable the module by using --without-http_rewrite_module
+option, or install the PCRE library into the system, or build the PCRE library
+statically from the source with nginx by using --with-pcre=<path> option.
+				- Dependancy packages :
+					- yum install pcre pcre-devel zlib zlib-devel openssl openssl-devel  ==> for centos/RHEL 
+					OR
+					- PCRE – Supports regular expressions. Required by the NGINX Core and Rewrite modules.
+						- wget github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.gz
+						  tar -zxf pcre2-10.42.tar.gz
+						  cd pcre2-10.42
+						  ./configure
+						  make
+						  sudo make install
+			-- If you want to run with added configuration : 
+				- ./configure --sbin-path=/usr/bin/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-pcre --pid-path=/var/run/nginx.pid --with-http_ssl_module
+				- Compile and install the build CMD :
+					- make
+					- make install
+				- Start nginx :
+					- nginx
+				- check all nginx commands like start stop reload:
+					- nginx -h
+					
+			-- Configure system service or systemd service for nginx to start/stop/reload/enable : this is availabe since ubuntu 15.0.4 and cenOss 7.0.0 (create init service for nginx) :
+				- systemd System and Service Manager LINK : 
+					- https://www.freedesktop.org/wiki/Software/systemd/
+				- NGINX Init Scripts LINK :
+					- https://www.nginx.com/resources/wiki/start/topics/examples/initscripts/
+				- NGINX systemd service file
+					- https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
+					- copy the copfig form the file and copy that in "/lib/systemd/system/nginx.service" path
+					- maybe reboot the machine and start the service
+					- systemctl start nginx
+					- systemctl enable nginx
+					
+		-- Configuration terms : 
+			- to test if configuration is correct or not ;
+				- nginx -t
+				
+			
 	
 	
 #######################################################
@@ -953,10 +1012,33 @@ TLS : Transport layer Security 1999 : TLS based on SSL / or upgraded SSL (RFC224
 
 -- openssl CMD	
 	- To generate RSA key:
-		- openssl genrsa // with no encryption
-		- openssl genrsa -aes256	// with AES265 encryption
-	 
+		- openssl genrsa -out private.key 2048 // with no encryption
+		
+	- To Verifying a private key file.
+		- openssl rsa -in private.key -check
+		
+	- To generate RSA private key and CSR certificate
+		- openssl req -nodes -newkey rsa:2048 -keyout custom.key -out custom.csr
+		
+	- To Verifying a CSR file
+		- openssl req -noout -text -in custom.csr
+
+	- Create new Private Key and Self Signed certificate.
+		- openssl req -x509 -sha512 -nodes -days 730 -newkey rsa:2048 -keyout custom.key -out custom.pem
+		
+	- To Verifying the Certificate Signer Authority
+		- openssl x509 -in custom.pem -noout -issuer -issuer_hash
 	
+	- To Checking Hash value of a certificate
+		- openssl x509 -noout -hash -in custom.pem
+	
+	- Converting PEM to DER format
+		- openssl x509 -outform der -in customprivate.pem  -out customprivate.der
+		
+	- Checking pem file certificate expiry date
+		- openssl x509 -noout -in custom.pem -dates
+		
+	- 
 	
 	
 
