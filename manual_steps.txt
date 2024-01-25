@@ -961,6 +961,147 @@ statically from the source with nginx by using --with-pcre=<path> option.
 					- make
 					- make install
 				- this will not change existing configuration . only add the new module
+				- after successfull installation we need to add  the module in /etc/nginx/nginx.conf file 
+					- load_module modules/ngx_http_xslt_filter_module.so ;
+		- compressed response with zip :
+			- Module ngx_http_gzip_module
+				- https://nginx.org/en/docs/http/ngx_http_gzip_module.html
+		
+		- performance testing with apache Bench (HTTP server benchmarking tool) :
+			- install : 
+				- apt-get install apache2-utils  => ubuntu/DEB
+				- yum install httpd-tools
+		
+		- fastCGI Cache :
+			- link of Module ngx_http_fastcgi_module :
+				- https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html
+				
+		- http2 : http1 is textual data and https2 is binay data.
+			- how to configure :	
+				- check the exisiting config :
+					- nginx -V ==> copy the config
+				- then go to nginx binay folder and find --with-http_v2_module like :
+					- ./configure --help | grep -i http_v2
+				- Then add that module in existing config :
+					- ./configure <existing config> --with-http_v2_module
+					- make
+					- make install
+					
+		- how to listen on http and send response on https:
+			- add new server block like below and restart nginx	
+				- server {
+							listen        80;
+							server_name  <server_name/IP>;
+							return 301 https://$host$request_uri
+						}
+	    - improve your nginx SSL configuration link:
+			- https://scaron.info/blog/improve-your-nginx-ssl-configuration.html
+			
+		- application or server load testing tool :
+			- siege : https://blog.eldernode.com/install-siege-on-centos/
+				- yum install siege		(centos/RHEL)
+				- apt install siege	 	(ubuntu/DEB)
+		- rate limitng in nginx :
+			- https://www.freecodecamp.org/news/nginx-rate-limiting-in-a-nutshell-128fe9e0126c
+			- https://www.nginx.com/blog/rate-limiting-nginx/
+		- basic Auth : is to add username and password layer above any admin login page
+			- link 
+				- https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+			- Frist we need to generate simple password file:
+				- .htpasswd  (this should be hidden file)
+			- install pre-requisit :
+				- yum install httpd-tools	(centos/RHEL)
+				- apt install apache2-utils	(ubuntu/DEB)
+			- command to create user and password :
+				- htpasswd -c <PathToFile>/.htpasswd <username>
+				- example:
+					htpasswd -c /etc/nginx/.htpasswd user1
+			- now add below lines in server block;
+				-  auth_basic "Secure Area";
+				   auth_basic_user_file /etc/nginx/.htpasswd;
+				- also you can enable and disable auth in individial block of location:
+					- auth_basic off/on; 
+		- Hardening nginx :
+			- keep everything upto date : 
+				- yum update -y 
+			- Check nginx version: 
+				- nginx -v
+			- Hide nginx version in responce add below lines in http block of nginx.conf file
+				- server_tokens off;
+				- Then reload server
+				
+			- add below header in server block to resist cross-origin framing :
+				- add_header X-Frame-Options "SAMEORIGIN";
+				- add_header X-XSS-Protection "1; mode=block";
+			- remove unnesesory and dengerus module : 
+				- we can get the module which we can remove bte CMD : 
+					- ./configure --help | grep -i without
+				- like if we want to unmount autoindex_module	we can build nginx with below module CMD: 
+					- --without-http_autoindex_module
+					- we can get the current installation cmd by :
+						- nginx -V
+					- Then copy the existing config with the one which we wanted to remove :  LIKE;
+						- ./configure --without-http_autoindex_module <existing config>
+						- make 
+						- make install
+						
+			- automatic generate and renew ssl/TLS certificate:
+				- https://letsencrypt.org/
+				- https://certbot.eff.org/
+				- https://letsencrypt.org/2015/11/09/why-90-days.html
+				- https://eff-certbot.readthedocs.io/en/latest/
+				
+	- Reverse Proxy : 	links :
+		- https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+		- https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+		- events{}
+		  http{
+		  server{
+				listen 8080;
+				proxy_set_header Host $host;
+				proxy_set_header X-Real-IP $remote_addr;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+				location / {
+					proxy_pass 'http://<ip/domain>/'
+					}
+			}
+		  }
+		  
+		- test curl with while loop :
+			-  while sleep 0.5; do curl -Ivk https://192.168.1.25:443 ; done
+		
+	- load ballancer ; links
+		- https://nginx.org/en/docs/http/load_balancing.html
+		- https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/
+		- https://nginx.org/en/docs/http/ngx_http_upstream_module.html
+		- http {
+			upstream backend {
+				# Least Connections – A request is sent to the server with the least number of active connections, again with server weights taken into consideration:
+				least_conn; 
+				
+				# IP Hash – The server to which a request is sent is determined from the client IP address. In this case, either the first three octets of the IPv4 address or the whole IPv6 address are used to calculate the hash value. The method guarantees that requests from the same address get to the same server unless it is not available
+				ip_hash;
+				
+				server backend1.example.com;
+				server backend2.example.com;
+				server 192.0.0.1 backup;
+			}
+			
+			server {
+				location / {
+					proxy_pass http://backend;
+				}
+			}
+		  }
+		- sticky session or ip_hashing or least_conn 
+		- 
+
+				
+					
+				
+				
+		
+			
 				
 			
 	
@@ -1056,7 +1197,7 @@ TLS : Transport layer Security 1999 : TLS based on SSL / or upgraded SSL (RFC224
 		- openssl req -noout -text -in custom.csr
 
 	- Create new Private Key and Self Signed certificate.
-		- openssl req -x509 -sha512 -nodes -days 730 -newkey rsa:2048 -keyout custom.key -out custom.pem
+		- openssl req -x509 -sha512 -nodes -days 730 -newkey rsa:2048 -keyout custom.key -out custom.crt
 		
 	- To Verifying the Certificate Signer Authority
 		- openssl x509 -in custom.pem -noout -issuer -issuer_hash
@@ -1070,7 +1211,8 @@ TLS : Transport layer Security 1999 : TLS based on SSL / or upgraded SSL (RFC224
 	- Checking pem file certificate expiry date
 		- openssl x509 -noout -in custom.pem -dates
 		
-	- 
+	- Create dhparam for ssl :
+		- openssl dhparam -out dhparam.pem 2048
 	
 	
 
