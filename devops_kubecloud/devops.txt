@@ -108,9 +108,16 @@ python :
 		- pip install <pkg_name>
 		- pip install <pkg_name> --upgrade
 		- pip uninstall <pkg_name>
-		- pip show <pkg_name>
+		- pip show <pkg_name>   # to check package version and details 
 	- where python interpriter look for packages:
 		-  python2 -c "import sys; print(sys.path)"
+		
+
+jenkins : 
+		jenkinsCLI : 
+			- get ssh key from pwd/.ssh/ dir 
+			- add SSH public key to user configuraton under ssh public key and save 
+			- ssh -i /home/mike/.ssh/jenkins_key -l mike -p 8022 jenkins-server help
 	
 		
 		
