@@ -118,6 +118,30 @@ jenkins :
 			- get ssh key from pwd/.ssh/ dir 
 			- add SSH public key to user configuraton under ssh public key and save 
 			- ssh -i /home/mike/.ssh/jenkins_key -l mike -p 8022 jenkins-server help
+			
+docker : CMD
+	- docker search <imagename>  # to search images
+	- docker attach foo 	# to attach to container it is same as docker exec -it <containerid>
+	- docker create --name=foo -it ubuntu:latest bash
+		- docker ps -a 
+		- docker start <container id>
+	- docker container ls -aq | xargs docker container rm		# Remove all containers
+	- docker image ls -aq | xargs docker rmi -f					# remove all images
+	- docker run -p 3001:3000 --name=server_container serve_image:v1
+	- docker run -d -p 3002:80 --name=express ajay/express:v1
+	- docker info | grep -i root 				## to search any thing
+	- docker exec -it <contianer-name> bash 	## to jump into docker container 
+	- docker cp <source-file> <container-id/name>:<path-inside container>  ## to copy fine in container
+Docker up command : 
+	- docker run --name jenkins-test --restart=on-failure --detach \
+  --publish 8081:8080 --publish 50000:50000 \
+  --volume /home/ajay/jenkins/jenkins_data/jenkins_home:/var/jenkins_home \
+  jenkins/jenkins:latest
+	- how to copy in docker
+		- docker cp <filename with path> <containername/ID>:<path inside container>
+	- how to move into docker container : 
+		- docker exec -it <containerid/ container name>
+	
 	
 		
 		
