@@ -141,6 +141,31 @@ Docker up command :
 		- docker cp <filename with path> <containername/ID>:<path inside container>
 	- how to move into docker container : 
 		- docker exec -it <containerid/ container name>
+		
+- There are 3 type of mount point : 
+ - volume mount
+ - bind mount
+ - tmpfs mount
+	- The volume mount persists data across containers by storing data in a docker-managed directory within the Docker engine. This is valuable when you need to hold on to container-created data, even if the container is removed.
+
+	- The bind mount takes a directory from the host machine and maps them to container 
+	directories. This helps when you need to constantly update a directory on the Docker host machine that contains valuable files for containers.
+
+	- The tmpfs mount is unique since data in this kind of directory only lasts during the lifetime of the running container using it. The tmpfs mount is beneficial when you need to use secret data like passwords.
+
+ 
+	- Docker volume mount : This is to mount docker engine volume path
+		- create volume : 
+			- docker volume create <volume_name>		# to create volume 
+			- docker volume ls 							# to see all created volume
+		- use the volume in container: 
+			-  docker run -d -p 3003:80 --name=bar --mount source=localvolume,target=/src/shared ajay/flask:v4
+	- docker bind mount : 
+		- this will mount any host machine path to container 
+			- docker run -d -p 3004:80 --name=foo --mount type=bind,source=/home/ajay/jenkins/docker/shared_vol,target=/src/bindmount ajay/flask:v4 
+	- Docker tmpfs mount : this path will create when we start the container and will be destroied whe we stop the container : 
+		- docker run -d -p 3003:80 --name=foo --mount type=tmpfs,destination=/tmpdir ajay/flask:v4
+				
 	
 	
 		
