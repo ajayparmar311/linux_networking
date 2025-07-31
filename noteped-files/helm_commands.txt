@@ -1,0 +1,529 @@
+- command to decode base64 
+	- echo "ENCODED_STRING" | base64 --decode
+
+- command to encode base64 
+	- echo -n "YOUR_STRING" | base64
+		The -n flag ensures that no extra newline character is included.
+		
+		
+		ssh -i private_key -L 9090:127.0.0.1:9090 -L 3000:127.0.0.1:3000 -L 9093:127.0.0.1:9093 vagrant@192.168.56.14
+
+
+
+- how to install minikube in Ubuntu VM created from vagrant.
+	1: Create a Ubuntu VM with 2CPU , 4gb RAM and If your VM runs on a hypervisor like VirtualBox, VMware, or Hyper-V, you must enable nested virtualization to use another hypervisor (like VirtualBox, KVM, or Docker) within the VM for Minikube.
+	
+	use Vagrentfile as below 
+	Vagrant.configure("2") do |config|
+		config.vm.box = "ubuntu/jammy64"
+		config.vm.network "forwarded_port", guest: 3000, host: 8080
+		config.vm.network "private_network", ip: "192.168.56.14"
+		config.vm.network "public_network"
+		config.vm.synced_folder "D:\\scripts\\shellScripts", "/opt/vagrant_data/scripts"
+		config.vm.provider "virtualbox" do |vb|
+			vb.memory = "4096"
+			vb.cpus = "2"
+			# enable nested virtualization
+			vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"] 
+	   end
+	end
+	
+	2 create the VM with command:
+		vagrant up
+	
+	3 Go into VM machine :
+		vagrant ssh
+	
+	4 now we will install docker , kubectl and minikube into over VM. WE will deploy minikube on docker.
+	
+	5 install docker .
+		- follow this link : https://docs.docker.com/engine/install/ubuntu/
+	6 Install minikube 
+		- Update the system 
+			sudo apt update && sudo apt upgrade -y
+		- Download the Minikube binary:
+			curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+			sudo install minikube-linux-amd64 /usr/local/bin/minikube
+			minikube version
+	
+	7 install kubectl 
+		- Minikube requires Kubernetes' CLI tool, kubectl.(Download the binary:)
+			curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+		- Make it executable and move it to a system path:
+			chmod +x kubectl
+			sudo mv kubectl /usr/local/bin/
+		- varify the installation
+			kubectl version --client
+			
+	8	give your user access to docker group
+		sudo usermod -aG docker $USER
+	
+	9 start Minikube with docker as HW,
+		minikube start --driver=docker
+	
+	9 After successful start , You can check the status of the cluster:
+		minikube status
+		
+	10 to access minikube deshboard louch deshboard. this will give u one URL u can use that to access deshboard from browser, but as u r using VM u need to fowword port from your host machine.
+		minikube dashboard
+	
+	11 exaple deshboard URL : 			http://127.0.0.1:40519/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+
+	12 start minikube deshboard in backgroud : 
+		nohup minikube dashboard > minikube-dashboard.log 2>&1 &
+		
+	13 strat kubectl proxy in background which will except all the ip and header :
+		nohup kubectl proxy --address=0.0.0.0 --accept-hosts='.*' > kubectl-proxy.log 2>&1 &
+	
+	14 Since the VM is isolated, forward the kubectl proxy port (default: 8001) to your host machine using SSH.
+		ssh -i private_key -L 8001:127.0.0.1:8001 vagrant@192.168.56.14
+		
+	14 now you can access minikubedshboard from host machine. from following machine.
+		http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+		
+		http://localhost:8001/api/v1/namespaces/default/services/my-release-tomcat:80/proxy/
+		
+	16 some common commands used for minikube 
+		minikube start
+		minikube stop
+		minikube delete 
+		minikube status
+		minikube ip		// give clusted IP
+		minikube ssh 	// ssh into node
+		minikube service nginx --url	// to get url of any kubeservice exposed as Nodeport
+
+	17	kubectl command :
+		kubectl cluster-info
+		 cat  ~/.kube/config		-- open kubectl config file
+
+
+
+	- IF you want to test mysql server 
+	kubectl run mysql-client --rm --tty -i --restart='Never' --image  docker.io/bitnami/mysql:8.4.3-debian-12-r4 --namespace default --env MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD --command -- bash
+
+
+helm repo list
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo remove bitnami
+
+
+Search the repository:
+helm search repo mysql
+helm search repo database
+helm search repo database --versions
+
+
+Install a package:
+kubectl get pods
+(Below Two commands - In a Different Shell/Commandline window/tab)
+minikube ssh
+docker images
+helm install mydb bitnami/mysql
+
+Check the cluster:
+kubectl get pods
+minikube ssh
+docker images
+To check the installation status:
+helm status mydb
+
+--------------------------------------------
+
+To Upgrade:
+
+ROOT_PASSWORD=$(kubectl get secret --namespace default mydb-mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode)
+
+helm upgrade --namespace default mysql-release bitnami/mysql --set auth.rootPassword=$ROOT_PASSWORD
+
+-------
+
+helm uninstall mysql-release
+
+--  we can pass values.yaml file in installation step to provide customized values 
+		- helm install mysql bitnami/mysql --values values.yaml
+	
+	we can also pass values in command itself: 
+		- helm install mysql bitnami/mysql --values auth.rootPassword=test1234
+	
+	
+	 - values.yaml file containes.
+		auth:
+			rootPassword: "test1234"
+			
+			
+-- we can update helm repo to fatch latest versions of chart
+	- helm repo update
+	
+	To Upgrade:
+
+		ROOT_PASSWORD=$(kubectl get secret --namespace default mydb-mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode)
+
+		helm upgrade --namespace default mysql-release bitnami/mysql --set auth.rootPassword=$ROOT_PASSWORD'
+		
+	upgrade with exisiting values : 
+		
+		helm upgrade mydb bitnami/mysql --reuse-values
+		
+	To keep the histry of installtaion after unintalling the service use :
+		helm uninstall mydb --keep-history
+		
+		
+- helm commands :
+	- helm list 			// this is to list the helm installed charts
+	
+- Dry run the helm installation for review (this will communicate with kubernets API service and validate the schama) : 
+	- helm install mydb bitnami/mysql --dry-run
+- To generate yaml template for kube 
+	- helm template mydb bitnami/mysql 
+	
+- To get commands
+	- helm env							// to see all helm env variables
+	- helm get notes mydb				// to get release note of installation
+	- helm get values mydb 				// custom values
+	- helm get values mydb --all 		// to get all values 
+	- helm get values mydb --revision <revision no>		// to get revision wise values 
+	- helm get manifest <service-name> 	// to get manifest files of service from the time of installation and upgrades , this will be used when someone did changes manully through kubectl this will help us to compair the manifest files  
+	- helm get manifest mydb --revision 1	// revision wise manifest data
+	- helm history <relesae_name>			// To get history of the release
+	- helm rollback mywebserver 1			// to rollback to anyversion
+	- helm uninstall mywebserver --keep-history 	// uninstall servier but keep the history so we can rollback again to same instance we want.
+	- helm install mywebserver bitnami/apache -n testns --create-namespace  // to create namespace with new release
+	- helm upgrade --install mywebserver bitnami/apache  // to install service if not exist and upgrade service if exist 
+	- helm install bitnami/apache --generate-name		// command to generate rendom name of the installation
+	- helm install bitnami/apache --generate-name --name-template "mywebserver-{{randAlpha 7 | lower}}"			// command to generate custom name of the installation
+	- helm install mywebserver bitnami/apache --wait // this will wait till 5 min default tim for service to start
+	- helm install mywebserver bitnami/apache --wait --timeout 7m20s // we can specify the timeout apart from 5min defalt time , 
+	- helm install mywebserver bitnami/apache --atomic	// if installation failed it will automatically rollback to previos successfull release this is helpfull in CI/CD pipelines where we do not want to keep failed service running 
+	- helm install mywebserver bitnami/apache --force	// used to forcefull restart all the element irrespective of updates
+	
+
+- Create own chart.
+	- helm create <chartname>
+- package chart for distribution:
+	-	helm package <chart-name>
+		(Successfully packaged chart and saved it to: /home/vagrant/helm/firstchart-0.1.0.tgz)
+	-	helm package <chart-name> --dependencies-update
+		helm package <chart-name> -u
+		// this is to download all the dependencies before creating the package 
+	-	helm package <chart-name> --destination (-d)	// to save the package to other dir
+	
+- validate helm chart.
+	- helm lint <chart-name>
+	
+- Go text compliter for templates.
+	- {{ -.Values.replicaCount -}} 	// all simple syntex to write your code inside
+	- . represent as the whole chart object
+	- .Values.replicaCount represent that we are taking value of replicaCount key from
+	values.yaml file 
+	- {-} dash represent as triming symbol which will be used to remove any space in between
+	
+- there are many such values we can use to take dynamic disition
+	- {{.Chart.Name}}
+	  {{.Chart.Version}}
+	  {{.Chart.AppVersion}}
+	  {{.Chart.Annotations}}
+	  {{.Release.Name}}				// release will gitve the release information dynamically at the time of installation
+	  {{.Release.Namespace}}
+	  {{.Release.IsInstall}}
+	  {{.Release.IsUpgrade}}
+	  {{.Release.Service}}
+	  {{.Template.Name}}
+	  {{.Template.BasePath}}
+	  
+	- {{.Values.my.name.is | default "neha" | upper | quote}}
+		we can use pipe and apply manay funtion to modify the output
+		The above syntex means that if you do not find any name at (.Values.my.name.is) use "neha" as default name and upper function used to change the value to uppercase and quote funtioin used to put value in quote's
+	  
+- if statement : 
+	
+{{ - if .Values.my.flag}}			-- we can pass boolean expression 
+{{- "IF my name is ajay" | nindent 2}}	-- this will be true block
+{{- else}}		-- this will be  false block (else bloack)
+{{- "else my name is neha" | nindent 2}}
+{{- end}}
+
+
+- with statement (this is to print list from the values)
+
+{{- with .Values.my.country}}	-- with statement with list to be traversed (Values.my.country)
+{{- toYaml . | nindent 2}}		-- (- toYaml .) hear toyaml . will print the values from the list
+{{- end}}
+
+- loops in helm 
+
+- range used for list
+{{- range .Values.my.country}}	-- range will loop through list and dicsenary
+  - {{ . | upper | quote}}		-- . represent the each value of the loop
+{{- end}}
+
+- range use for dicsenary
+{{- range $key,$value := .Values.image}}	-- hear we are getting both key and values fron dictonary
+  - {{$key}}: {{$value | quote }}		-- printing both key and values separetly
+{{- end}}
+
+	  
+- Add dependencies to helm chart : 
+	- add dependencies in Chart.yaml file (like if u want mysql to be included along with your app)
+		- dependencies:
+			- name: mysql
+			  version: ">=9.0.0"
+			  repository: "https://charts.bitnami.com/bitnami"
+			  
+		add this values and save then run the below command 
+		- helm dependency update		// to pull all the dependency to the current chart
+		- helm dependency list			// to list all the dependencies
+		
+	- after this we can install the chart this will also install the mysql dependency
+		- helm install <app-name> <chart-name>
+		
+	- we can also add flag in dependencies: 
+		dependencies:
+			- name: mysql
+			  version: ">=9.0.0"
+			  repository: "https://charts.bitnami.com/bitnami"
+			  condition : mysql.enabled		// mysql.enabled we can mentions in Values.yaml file
+			  tag:							// we can use single tag for all dependancy to enable or disable
+			    - enabled
+	- we can also pass custom values to dependancies.For that we can add custom values in Values.yaml of the parent app under the name tag of the dependency.
+	- Values.yaml
+	
+		 mysql:
+			enabled: true
+			auth:
+			  rootPassword: "test1234"
+			primary:
+			  service:
+				type: NodePort
+				nodePort: 32000
+	
+	- how to import values from child chart to parent chart?
+	  For that you need to edit Chart.yaml file under that u have to add "import-values" key
+	  Please find example below
+	  
+	  dependencies:
+	    - name: mysql
+		  version: ">=9.0.0"
+		  repository: "https://charts.bitnami.com/bitnami"
+		  condition: mysql.enabled
+		  import-values:				// this attribute will get values from child to parent
+		  	- child: primary.service	// specify child values
+		  	  parent: mysqlService		// specify the object name where u wamt to access in parenet 
+	  
+
+- Hooks in Helm : In Helm, a hook is a special type of Kubernetes manifest that runs at specific points in the release lifecycle of a Helm chart. Hooks allow you to execute tasks before or after certain Helm operations, such as installing, upgrading, or deleting a release
+
+	mode of hooks (hook creation policy): 
+	annotation:
+		"helm.sh/hook": pre-install
+		
+		- pre-install
+		  post-install
+		  pre-delete
+		  post-delete
+		  pre-upgrade
+		  post-upgrade
+		  pre-rollback
+		  post-rollback
+		  test
+		  
+	- hook priority weight:
+	  annotation:	
+		"helm.sh/hook-weight": "1"			// this can be negetive or positive number , if there are multiple hook then that will be run in assending order of the number
+			
+	- hook deletion policy: 
+	  annotation:
+		"helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+		
+		- before-hook-creation			// default policy
+		  hook-succeeded				// after running hook successfully
+		  hook-failed					// if hook got failed
+		  
+	- Example for hook : 
+		
+		apiVersion: batch/v1
+		kind: Job
+		metadata:
+		name: my-hook-job
+		annotations:
+			"helm.sh/hook": pre-install
+			"helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+		spec:
+		template:
+			spec:
+			containers:
+			- name: job
+				image: busybox
+				command: ['echo', 'Running pre-install job']
+			restartPolicy: Never
+			
+	- we can test the deployment by running below command after successful installation of app
+		- helm test <appname>
+			- this will read test hook from <chardir>/template/test/testhook.yaml and execute busybox container for testing
+  
+  
+- repository:
+	- local repo : 
+		1. create folder : mkdir chartsrepo
+		2. create index.yaml file by command below
+			helm repo index chartsrepo/
+		3. package your chart in repo.
+			helm package firstchart -d chartsrepo/
+		4. Update index.yaml file .
+			helm repo index chartsrepo
+			
+	- host your repo using python (pythone have inbuild http server):
+		1. check python installed on your machine or not : 
+			pythone3 --version 	//make sure that you will be having 3 or higher version
+		2. go into your chart repo : 
+			cd chartsrepo
+		3. start http server in the repo . 
+			python3 -m http.server --bind 127.0.0.1 8080 &  		// & is used to run this job in background
+			nohup python3 -m http.server --bind 127.0.0.1 8080 &
+			- you can get the background running jobs by below command : 
+			   - jobs
+		4 how to access : 
+			1 you can curl to : http://127.0.0.1:8080 to your terminal to validate 
+			2 you can go to your browser and hit http://127.0.0.1:8080 to get the repo page
+			
+	- how to use the local repo .
+		- we will add the local repo to helm repo list . 
+			helm repo add <REPO-NAME> http://127.0.0.1:8080
+			helm repo list		// check the repo list 
+			
+	- how to use local repo to install service: 
+		-  helm install myapp localrepo/firstchart
+		
+	- how to pull helm package from local repo or from any repo.
+		- helm pull localrepo/firstchart			// pull from local repo
+		  helm pull bitnami/mysql					// pull from remote bitnami repo
+		
+		- Use the pulled package for installation: 
+		  helm install myapp firstchart-0.1.0.tgz
+		  
+	-  add new chart to local repo.
+		- create new chart.
+			helm create <chart-name>
+		- packge that chart into localrepo dir
+			helm package <chart-name> -d <localrepo- destination-path>
+		- update index.yaml file
+			helm repo index <localrepo-dir>
+			after this command you will see that index.yaml is updated
+		- now check if you have added loaclepo to your helm repo list
+			helm repo list	-- if exist then fine if not the add localrepo to your helm
+			- start local repo as http service
+				cd <localchart>			-- cd into chart repo
+				python3 -m http.server --bind 127.0.0.1 8080 &		-- start python3 hht server as localhost
+				helm repo add <repo-name> http://127.0.0.1:8080		-- add localrepo to helm repo list
+				helm repo update		-- update repo cache
+				helm repo list			-- list updated repo 
+		- now we can search our localrepo chart 
+			helm search repo <Chart-name>
+		  
+			 
+- helm OCI for reposetory: 
+	
+	docker run -d --name oci-registry -p 5000:5000 registry
+	helm package firstchart
+	helm push firstchart-0.1.0.tgz oci://localhost:5000/helm-charts
+	helm show all oci://localhost:5000/helm-charts/firstchart --version 0.1.0
+	helm pull oci://localhost:5000/helm-charts/firstchart --version 0.1.0
+	helm template myrelease oci://localhost:5000/helm-charts/firstchart --version 0.1.0
+	helm install myrelease oci://localhost:5000/helm-charts/firstchart --version 0.1.0
+	helm upgrade myrelease oci://localhost:5000/helm-charts/firstchart --version 0.2.0
+	helm registry login -u myuser <oci registry>
+	helm registry logout <oci registry url>
+	curl -X GET http://localhost:5000/v2/_catalog 		-- to get the registry content
+			
+
+- Chart security : 
+	- for security perposed where no one can change your chart content in repo , We your public and private key encription and siging. so inthis case we sign the package generated from chart with the private key and that will generate .prov fine along with .tgz file which containe the hash of the package and when someone access the chart from that repo , they has to varify the chart content with the public key will will varify the has from .prov file.
+	
+	- to create key for signature : we will be using gpg tool ,
+		- check if u have gpg tool installed in your machine if not then install
+		- run : gpg --full-generate-key
+	v	- check the keys in 
+			: ls -la ~/.gnupg 
+		- conver pubring.kbx key to .gpg extra
+			:  gpg --export-secret-keys > ~/.gnupg/secring.gpg				// this will ask for passphresh
+			
+	- How to sign the charts using private keys, package your chart with private key :
+		helm package --sign --key <emailid> --keyring ~/.gnupg/<.gpg key name> <chart-name> -d <repo-path>
+exampl: helm package --sign --key ajay@helm.com --keyring ~/.gnupg/<publickeyname.gpg> firstchart -d chartsrepo/
+	
+	- varify the chart at client end : 
+		helm verify chartsrepo/firstchart-0.1.0.tgz --keyring ~/.gnupg/secring.gpg
+exampl: helm verify <packagepath <name>.tgz> --keyring ~/.gnupg/<publickeyname.gpg>
+	
+	- how to varify and install the chart at the same time.
+		helm install --verify --keyring ~/.gnupg/secring.gpg tmmpapp localrepo/firstchart
+exampl: helm install --verify --keyring ~/.gnupg/<publickeyname.gpg> <app-name> <reponame/chartname>
+
+
+- Create chart using helm starter:
+	- A Helm Starter is a feature in Helm that allows you to create reusable templates for generating Helm charts. It acts as a scaffold template for creating new Helm charts with predefined files and configurations.
+	 
+	- create folder to store helm starters, helm will expect starters to be stored in HELM_DATA_HOME path :
+		- run below command to het the path value then create that path if not exist.
+		  - helm env HELM_DATA_HOME
+			mkdir -p /home/vagrant/.local/share/helm/starters
+	- Now we will create starter, For that copy the chart which you want to use as starter and paste that in (/home/vagrant/.local/share/helm/starters) path 
+		- cp -r cooponservice /home/vagrant/.local/share/helm/starters/
+		- rename the file as generic starter name
+			- mv /home/vagrant/.local/share/helm/starters/cooponservice /home/vagrant/.local/share/helm/starters/springwebappmysql
+			
+		- Now go into starter /home/vagrant/.local/share/helm/starters/springwebappmysql folder open each file and replace chertname to <CHARTNAME> placeholder
+			- do that for all the files in template folder 
+			- no need to do any changes in Chart.yaml and values.yaml 
+			- in VIM, execute below command : 
+				:%s/yourchartname/<CHARTNAME>/g
+ 			- helm create --starter <startername in /home/vagrant/.local/share/helm/starters folder > <app name>
+		example: helm create --starter springwebappmysql demoapp
+			- springwebappmysql : is the starter name under /home/vagrant/.local/share/helm/starters (helm env HELM_DATA_HOME) folder
+			- demoapp : chart name that will be replce with <CHARTNAME> placeholder.
+			
+- plugin in helms : 
+	- search in goolge for "helm starter plugin github"
+	- helm plugin list			// to list all the plugin
+	-  helm plugin install https://github.com/salesforce/helm-starter.git		// to fatch and install plughin 
+	- the plugin file path will be : helm env HELM_PLUGINS
+	- helm plugin update starter		// to updte the plugin
+	- helm plugin remove starter		// to remove the plugin
+	
+- create custom plugin : 
+	- create folder to keep plugin 
+		mkdir mycustom plugin
+	- create plugin.yaml file inside that folder
+	
+		cat << EOF > plugin.yaml
+		name: "myplugin"
+		version: "1.0.0"
+		description: "my first custom plugin"
+		usage: "helm myplugin"
+		ignoreFlags: false				-- false will pass the flag if any passed , true will discard any flag passed
+		command: "echo the plugin $HELM_PLUGIN_NAME is located in $HELM_PLUGIN_DIR"
+		platformCommand: 	-- we can use this key to apecify the os based commands
+		  - os: linux
+			arch: i386
+			command: <command based on about plateform>
+		  - os: windows
+			arch: amd64
+			command: <command based on about plateform
+		EOF
+		
+	- now cd into plugin folder and run below command.
+		- helm plugin install .
+		
+	- you can use this plugin as : 
+		- helm myplugin 	
+		
+- in helm 3.0 we have scama validation feature , in that we need to provide on values.schema.json file with all the constrants we want for values.yaml file
+	- we can generate values.schama.json from values.yaml file in 2 process
+		1 : convert values.yaml to json format for that use below site : 
+			- https://www.json2yaml.com/
+		2 : copy the json from above step and paste that in below site to generate schema
+			- https://www.jsonschema.net/
+	 
+	
+	
+	
+	

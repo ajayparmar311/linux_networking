@@ -1,0 +1,119 @@
+community : https://kodekloud.com/pages/community
+
+devops process :
+develop --> build --> test --> deploy
+
+CI/CD pipeline : needed for devops
+
+	- Docker : 
+		we will use container image to redues container based  	deployment.
+	- kubernetes :
+		container orchestration :
+	- terraform : 
+		we will use terraform as IaaC (infrastructure as a code) as infrastructure provisioing tool.
+	- ansible:
+		we will use ansible for post provisioing auto configuration action.like installing software and configuring them.
+	- Prometheus : 
+		use to collect server information or matric and store that centrally like cpu utilization , memory utilization etc.
+	- grafana : 
+		use to visualise the data collected from prometheus in charts and graphes.
+
+DevOps is a combination of people, processes and tools/programs.
+code-->build-->test-->release-->deploy-->operate-->monitor->feedback
+and repeate
+
+cat /etc/centos-release
+cat /etc/redhat-release
+
+
+
+Types of Testing
+	Different Types of Testing that can be automated
+	
+		- Unit Testing
+		- Integration Testing
+		- Functional Testing
+		- Smoke Testing
+		- Regression Testing
+		 		-
+services : 
+	- we can configure our own services as systemctl : 
+		- systemctl start/stop/enable my_app
+	- for that we need to configure our application as systemd unit file .
+		- file location : 
+			- /etc/systemd/system
+	- we have to create the service name file with extention as .service like :
+		- my_app.service
+		- inside that file add :
+			- [Service]
+			  ExecStart=/usr/bin/python3 /opt/code/my_app.py
+			  
+			- Then save the file 
+			- Then run : 
+				- systemctl daemon-reload
+				- systemctl start/stop my_app
+
+networking : 
+	- how to check the exsisting interface : 
+		- ip link
+	- how to add IP to and interface :
+		- ip addr add 192.168.1.10/24 dev eth0
+			- The IP range should be from switch level
+	- how to add router entry : 
+		- check the current entry by CMd : 
+			- router
+		- how to add enrty : 
+			- ip route add <destination addr> via <getway IP / router IP>
+			- Example : 
+				- ip route add 192.168.2.0/22 via 192.168.1.1
+	- To forword data in internet interfaces we need to update below file : 
+		- /proc/sys/net//ipv4/ip_forward
+		change 0 to 1 to enable the feature
+		- 0 means no-forward
+		- 1 means forward
+		
+		- also change the value in /etc/sysctl.conf file
+			- net.ipv4.ip_forward = 1
+			
+Java : 
+	export PATH=$PATH:/opt/jdk-20/bin
+	
+nodejs : 
+	- how to download and install : 
+		- wget https://nodejs.org/dist/v21.7.1/node-v21.7.1.tar.gz
+		- tar -xvf node-v21.7.1.tar.gz
+		- yum install centos-release-scl-rh
+		- yum install devtoolset-10-gcc devtoolset-10-gcc-c++
+		- scl enable devtoolset-10 bash
+		- cd node-v21.7.1
+		- ./configure
+		- make
+		- make install
+		- https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-a-centos-7-server
+		- https://forums.centos.org/viewtopic.php?t=68077#p285857
+	- package managemenet tool in nodejs : 
+		- NPM : NPM comes with nodejs installation 
+			CMD -  npm -v 							# version of NPM
+				-  npm search <name_of_package> 	# to searach any package with name 
+				-  npm install <package_name> 		# To install any package
+				-  node -e "console.log(module.paths)"	# to check all the configured path to check modules
+				- buildin modules in nodes : 
+					- ls /usr/lib/node_modules/npm/node_modules/
+					
+python : 
+	- python package comes under : 
+		- /uer/lib
+		- /usr/lib64
+	- how to install packages : 
+		- pip install <pkg_name>
+		- pip install <pkg_name> --upgrade
+		- pip uninstall <pkg_name>
+		- pip show <pkg_name>
+	- where python interpriter look for packages:
+		-  python2 -c "import sys; print(sys.path)"
+	
+		
+		
+		
+		
+	

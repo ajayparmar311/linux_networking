@@ -1,0 +1,504 @@
+
+
+terraform uses : HCL language 
+	- HCL (HashiCorp Configuration Language)
+	
+install terraform : 
+	sudo yum install -y yum-utils
+	sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+	sudo yum -y install terraform
+	
+HCL language : 
+
+	<block> <parameters> {
+		key1 = value1
+		key2 = value2
+	}
+	
+	resource "local_file" "pet" {
+        filename = "/root/pet.txt"			# Arguments
+        content = "We love pets!"			# Arguments
+	}
+	
+	resource =  block name
+	local_file :
+		- local = provider
+		- file = resource
+	pet =  resource name	
+	
+-	how to execute terraform file : 
+	  - terraform init : 
+	  - terraform validate	: to validate config file
+	  - terraform fmt 		: cmd to format terraform config file
+	  - terraform plan 		: review execution  plan
+	  - terraform apply 	: apply the changes
+	  - terraform destroy 	: to destroy resource
+	  - terraform console 	: opens interactive console for testing 
+	  - terraform show 	  	: to check attribute after terraform apply command
+		- terraform show -json : to see data in json format
+	  - terraform output  	: to print all the output variable from current config dir
+	  - terraform providers : to see all the provider used in config
+		- terraform providers mirror <path to copy> : to copy provider to other dir
+	  - terraform refresh   : to sync terraform with real world infra
+	  - terraform graph		: show config dependencies graph
+		- apt install graphviz -y
+		- terraform graph | dot -Tsvg > graph.svg
+
+- file format in terraform :
+	- main.tf		# main config file containing resource defination
+		- resource "local_file" "pet" {
+			filename = "/root/pet.txt"			# Arguments
+			content = "We love pets!"			# Arguments
+		  }
+		  
+		  resource "random_pet" "my-pet" {
+			prefix = var.prefix[0]
+		  }
+		  
+		  resource "local_file" "her-pet" {
+			filename = "/root/pet.txt"			# Arguments
+			content = var.file-content["statement2"]
+		  }
+		  
+		  
+	- variables.tf	# container veriable declarations
+		- variable "<veriablename>" {
+			default = "<default value>"
+			type = <type of vavriable like : string,bool,number,list,map,object,tuple>
+			description = "ny relavent description for veriable"
+		  }
+		- Example : 
+		  - variable "path" {
+				default = "/root/pet_name.txt"
+				type = string
+				description = "mypet name is simba"
+			}
+			
+			variable "prefix" {
+				default = ["Mr","Mrs","Sir"]
+				type = list
+			}
+			
+			variable "prefixtype" {
+				default = ["Mr","Mrs","Sir"]
+				type = list(string)
+				
+			}
+			
+			variable "file-content" {
+				type = map
+				default = {
+					"statement1" = "we love pet!"
+					"statement2" = "we love animals"
+				}
+			}
+			
+			variable "bella" {
+				
+				type = object({
+					name = string
+					color = string
+					age =number
+					food = list(string)
+					favorite_pet = bool
+				})
+				
+				default = {
+					name = "bella"
+					color = black
+					age = 7
+					food = ["fish","chicken","turkey"]
+					favorite_pet = true
+				}
+			}
+			
+			variable kitty {
+				type = tuple([string,number,bool])
+				default = ["cat",7,true]
+			}
+		  
+		  
+		  
+	- outputs.tf	# container output from resource
+	- provider.tf	# contains provider defination
+	
+- how to pass variable : 
+	-  terraform apply -var "filename=/root/pets.txt" -var "content=we love pets" -var "prefix=Mrs" -var "separator=." -var "length=2"
+	
+	- veriable definition files name : terraform.tfvars | terraform.tfvar.json
+		- file containt :
+		  - filename = "/root/pets.txt"
+			content = "we love pets"
+			prefix = "Mrs"
+			separator = "."
+			length = "2"
+		- how to pass this file in command :
+			-  terraform apply -var-file variables.tfvars
+			
+	- we can also export the variables :
+		- export TF_VAR_filename = "/root/cats.txt"
+		
+	- variable definition precedence :
+		- 1 : terraform apply -var "filename=/root/pets.txt" -var "content=we love pets" -var "prefix=Mrs" -var "separator=." -var "length=2"
+		- 2 : variable.auto.tfvars
+		- 3 : terraform.tfvars
+		- 4 : export TF_VAR_filename = "/root/cats.txt"
+		
+
+	- resource dependencies : 
+		resource "local_file" "pet" {
+				filename = var.filename
+				content = "my favorate pet is ${random_pet.my-pet.id}"
+				file_permission = "0700"
+				
+				depends_on = [
+						random_pet.my-pet
+					]
+		}
+		
+		resource "random_pet" "my-pet" {
+				prefix = var.prefix
+				separator = var.separator
+				length = var.length
+		}
+		
+	- output variable :
+		- systex :
+			output <VARIABLE-NAME> {
+				value = <VARIABLE-VALUE>
+				<arguments>
+			}
+		
+		= example :
+		resource "local_file" "pet" {
+				filename = var.filename
+				content = "my favorate pet is ${random_pet.my-pet.id}"
+				file_permission = "0700"
+				
+				depends_on = [	# meta arguments
+						random_pet.my-pet
+					]
+		}
+		
+		resource "random_pet" "my-pet" {
+				prefix = var.prefix
+				separator = var.separator
+				length = var.length
+		}
+		
+		output pet-name {
+			value = random_pet.my-pet.id
+			description = "record the value of pet ID generated by the random_pet resource"
+		}
+		
+	- terraform state:
+		- to not refresh state everytime : 
+			- terraform plan --refresh=false
+	
+	- lifecycle rules : 
+		- if u want to destroy after creating new file
+			resource "local_file" "pet" {
+					filename = var.filename
+					content = "my favorate pet is simba"
+					file_permission = "0700"
+					
+					lifecycle = {	# meta arguments
+							create_before_destroy = true
+						}
+			}
+			
+		- if u do not wnat to destroy old config
+			resource "local_file" "pet" {
+					filename = var.filename
+					content = "my favorate pet is simba"
+					file_permission = "0700"
+					
+					lifecycle = {	# meta arguments
+							prevent_destroy = true
+						}
+			}
+			
+		- if u  wnat to ignore changes to resource attributes(specific/all)
+			resource "aws_instance" "webserver" {
+					ami = "ami_sdfasdfa12312312"
+					instance_type = t2.micro"
+					tag = {		# meta arguments
+						Name = "ProjectA-Webserver"
+					}
+					
+					lifecycle = {	# meta arguments
+							ignore_changes = [
+								tags,ami
+								
+							]
+						}
+			}
+							
+
+	- Data Sources : allow terraform to read attribute which are provisioned outside terraform control : 
+		
+		resource "local_file" "pet" {
+					filename = var.filename
+					content = "my favorate pet is simba"
+					file_permission = "0700"
+					
+					lifecycle = {	# meta arguments
+							create_before_destroy = true
+						}
+			}
+		
+		date "local_file" "dog" {
+			filename = "<anyfile outside terraform control>"
+		}
+		
+		# to use data from above block we can write 
+		
+		resource "local_file" "pet_as_dog" {
+					filename = var.filename
+					content = data.local_file.dog.content
+					file_permission = "0700"
+
+			}
+			
+	- Meta Arguments : 
+		- main.tf
+			resource "local_file" "pet" {
+					filename = var.filename[count.index]
+					content = "my favorate pet is simba"
+					file_permission = "0700"
+					
+					count = length(var.filename)		# meta arguments to create 3 files
+						
+			}
+			
+		- veriables.tf
+			
+			variable "filename" {
+				default = [
+					"/root/pets.txt"
+					"/root/dogs.txt"
+					"/root/cats.txt"
+				]
+			}
+			
+	- functions : 
+		- length =  to find length of any argument
+			- color = ["red","blue"] 
+			- length(color)
+			- 4
+	
+	- for_each loop : 
+		
+			resource "local_file" "pet" {
+					filename = each.value
+					content = "my favorate pet is simba"
+					file_permission = "0700"
+					
+					for_each = toset(var.file-content)
+						
+			}
+			
+	- Version constraints : 
+	
+		terraform {
+			required_providers {
+				local = {
+				source = "hashicorp/local"
+				version = "2.5.1"
+				version = "!= 2.5.1"
+				version = "< 2.5.1"
+				version = "> 2.5.1"
+				version = "< 2.5.1, < 2.0.0 ,!= 2.3.0"
+				version = "~> 1.2"
+				version = "~> 2.0.0"
+				
+				}
+			}
+		}
+		
+		resource "local_file" "pet" {
+			filename = "/root/pet.txt"			# Arguments
+			content = "We love pets!"			# Arguments
+		  }
+		
+	- Install awscli : 	
+		- curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+		  unzip awscliv2.zip
+		  sudo ./aws/install
+		  sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+		  
+		- aws commands : 
+			- aws <command> <subcommand> [options and perameters]
+			Example : 
+				- aws iam  create-user --user-name lucy
+			- aws help 					# to access all the aws related commands
+			- aws <command> help 		# to access specific service related commands
+			  aws iam help
+			  aws iam create-user
+			- aws --endpoint http://aws:4566 iam list-users  # to specify any specific endpoint
+		
+		- terraform state commands : 
+			- terraform state <subcommands> [options] [args]
+			  terraform state show aws_s3_bucket.finance
+			- sub-commands : 
+				- list
+					- terraform state list
+				- mv
+					- terraform state nv [options] SOURCE DESTINATION
+					  
+				- pull
+					- terraform state pull		# to pull remote state
+				- rm
+					- terraform state rm [address]
+					  terraform state rm aws_s3_bucket.finance
+				- show
+					- terraform state show [options] [address]
+					  terraform state show aws_s3_bucket.finance-2020922
+					  
+		- terraform remote and local exec provisioner : 
+			- remote exec provisioner
+			
+				resource "aws_instance" "webserver" {
+					ami	= "ami-dsfasdnjknasd21"
+					instance_type = "t2.micro"
+					
+					user_date = <<-EOF
+								#!/bin/bash
+								sudo apt update
+								sudo apt install nginx -y				
+								sudo systemctl enable nginx
+								sudo systemctl start nginx
+						EOF
+					
+					
+					provisioner "remote-exec" {
+						inline = [
+								"sudo apt update",
+								"sudo apt install nginx -y",						
+								"sudo systemctl enable nginx"
+								"sudo systemctl start nginx"
+						]
+					}
+				connection {
+					type	= "ssh"
+					host	= self.public_ip
+					user	= "ubuntu"
+					private_key	= file("/root/.ssh/web")
+				}
+				key_name = aws_key_pair.web.id
+				vpc_security_group_ids = [vpc_security_group.ssh-access.id]
+				
+				}
+			- local exec provisioner : 
+				
+				resource "aws_instance" "webserver" {
+					ami	= "ami-dsfasdnjknasd21"
+					instance_type = "t2.micro"
+					provisioner "local-exec" {
+						on_failure = fail/continue
+						command = "echo ${aws_instance.webserver.public_ip} >> /tmp/ips.txt"
+					}
+		
+					provisioner "local-exec" {
+						ehwn = destroy
+						command = "echo ${aws_instance.webserver.public_ip} Distroyed! >> /tmp/instance_state.txt"
+					}
+				
+				}
+	
+	- terraform taint : 
+		- terraform taint aws_instance.webserver
+		- terraform untaint aws_instance.webserver
+		
+	- terraform debugging : 
+		- export TF_LOG=<LOG_LEVEL>
+			- INFO
+			- WORNING
+			- ERROR
+			- DEBUG
+			- TRACE
+		- TO generate log into a file : 
+			- export TF_LOG_PATH=/tmp/terraform.log
+		- To disable the file logging : 
+			- unset TF_LOG_PATH
+			
+	- terraform import : 
+		- terraform inport <resource_type>.<resource_name> <attribute>
+		
+	- terraform modules : 
+		- local module : 
+			module "dev-webserver" {
+				source = "../aws-instance/"
+				key = value
+			}
+		
+		- remote module from terraform regisry:
+			
+			
+	- terraform functions : 
+		- resource "aws_iam_policy" "adminUser" {
+			name	= "AdminUsers"
+			policy	= file("admin-policy.json") 	# file function
+		  }
+		  
+		  resource "local_file" "pet" {
+			filename	= vavr.filename
+			count		= length(var.filename) 	# length function
+			for_each 	= toset(var.filename)	# toset function
+		  }
+		  
+		- Some of the terraform functions
+			- Numeric functions
+				- max() : to get the max number from list
+					- maxvar.num...)	# to use variable
+				- min()	: to get min number
+					- maxvar.num...)
+				- ceil(10.1)	# this will be 11
+				- floor(10.1)	# this return 10
+				
+			- String Functions
+				- split(",","ami-xyz,AMI-ABC,ami-efg")
+				  split(",",var.ami)
+					output : ["ami-xyz","AMI-ABC","ami-efg"]
+				- lower("ami-xyz,AMI-ABC,ami-efg")
+					output : ami-xyz,ami-abc,ami-efg
+				- upper("ami-xyz,AMI-ABC,ami-efg")
+					output : AMI-XYZ,AMI-ABC,AMI-EFG
+				- title("ami-xyz,AMI-ABC,ami-efg")
+					output : "Ami-Xyz,AMI-ABC,Ami-Efg"
+				- substr("ami-xyz,AMI-ABC,ami-efg",0,7)
+					output : "ami-xyz"
+				- join(",",["ami-xyz","AMI-ABC","ami-efg"])
+					output : "ami-xyz,AMI-ABC,ami-efg"
+					
+			- collection functions : for collection datatype like set,list,map
+				- length(["ami-xyz","AMI-ABC","ami-efg"])
+					output : 3
+				- index(["ami-xyz","AMI-ABC","ami-efg"], "AMI-ABC")
+					output : 1
+				- element(["ami-xyz","AMI-ABC","ami-efg"], 2)
+					output : "ami-efg"
+				- contains(["ami-xyz","AMI-ABC","ami-efg"], "AMI-ABC")
+					output : true
+				- keys(var.map)
+				- values(var.map)
+				- lookup(var.map, "<value to lookup>" , "<default value to prevent error>")
+		
+			- type conversion functions
+			
+	- conditional Expression and operator :
+		- numeric operators:
+			- +,-,*,/ etc...
+		- equality operators :
+			- ==,!=
+		- conparision operators:
+			- <,>,<=,>=
+		- logical operators :
+			- &&,||,!
+		- conditional operator: 
+			- condition ? true_value : false_value
+			- length =  var.length < 8 ? 8 : var.length
+			
+	- terraform workspace : it is similer as namespace
+		- terraform workspace new <workspacename>
+		- terraform workspace select <workspacename>

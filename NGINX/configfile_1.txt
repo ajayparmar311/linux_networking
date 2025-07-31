@@ -1,0 +1,209 @@
+# For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+user nginx;
+#worker_processes auto; This can  ber increased as number of cpus , auto will do the same
+worker_processes auto;
+error_log /var/log/nginx/error.log notice;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+
+events {
+   # number of files or processes a worker can handle
+   # check the no processes or file a CPU can open by CMD : ulimit -n
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    keepalive_timeout   65;
+    types_hash_max_size 4096;
+    # This is to include the type of content that nginx can host
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+
+###### To hide httpd/nginx version #####
+        server_tokens off;
+
+    server {
+        listen        80;
+        server_name  www.ajay.com;
+        return 301 https://$host$request_uri;
+
+        }
+
+    server {
+        #default port for nginx we can change the port if needed
+       # listen       80;
+       # listen       [::]:80;
+         listen       443 ssl;
+         listen       [::]:443 ssl;
+#        http2 on;
+
+        #this is server name of hostname or domain name
+        server_name  www.ajay.com;
+
+###### SSL certificate config #####
+
+        ssl_certificate "/etc/nginx/ssl/self.crt";
+        ssl_certificate_key "/etc/nginx/ssl/self.key";
+
+#### disable ssl and enable TLS ######
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+
+#### optimize cipher suits #######
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers         AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;
+#### basic authentication #################
+#       auth_basic "Secure Area";
+#       auth_basic_user_file /etc/nginx/.htpasswd;
+
+
+### Enable DH Params ##############
+        ssl_dhparam     /etc/nginx/ssl/dhparam.pem;
+### Enabvle HSTS ##################
+        add_header Strict-Transport-Security max-age=63072000;
+### Enable SSL sessions ################
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout  10m;
+        ssl_session_tickets     on;
+#####  resist cross-origin framing ######
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-XSS-Protection "1; mode=block";
+
+
+        #This is root dir from where nginx will copy the source code for hosting
+        root         /usr/share/nginx/html;
+        index index.html
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        # 1. below is to host Exact 404.html single page
+        # Exact match
+        #error_page 404 /404.html;
+        location = /404.html {
+                #return 200 'hello from page "404.html" ';
+        }
+
+        # 2. below is to host error[0-9].html which can have 0 to 9 value in suffix and prifix is case sensitive
+        # RAGEX MATCH - CASE SENSITIVE
+       #error_page 404 /404.html;
+        location ~ /error[0-9].html {
+                return 200 'hello from page "error[0-9].html" ';
+        }
+
+
+        # 2. below is to host error[0-9].html which can have 0 to 9 value in suffix and prifix CAN be case nonsensitive
+        # REGEX MATCH - CASE INSENSITIVE
+       #error_page 404 /404.html;
+        location ~* /error[0-9].html {
+                return 200 'hello from page "error[0-9].html" ';
+        }
+
+
+        # 3. below is to host any page which starts from contact
+        # PRIFIX MATCH
+        #error_page 404 /404.html;
+        location /contact {
+                return 200 'hello from page "contact.html" ';
+        }
+
+
+        # 3. below is to host any page which starts from contact and prefered before any prefix match
+        # PREFERENTIAL PRIFIX MATCH
+        #error_page 404 /404.html;
+        location /Error2 {
+                return 200 'hello from page "contact.html" ';
+        }
+
+############ VERIABLES ########################
+
+        location = /inspect.html {
+        return 200 "$host\n$uri\n$args" ;
+        }
+        location = /test1.html {
+        return 200 "Name: $arg_name" ;
+        }
+
+        ###### if loop in nginx to check invalid API key #########
+        #
+        #if ( $arg_apikey != 1234 ){
+        #return 401 "Incorrect api key";
+        #}
+        #
+  #############   SET Veriables   #####################
+
+        set $weekend "no" ;
+
+        #check if weekend
+        if ( $date_local = "Saturday|Sunday" ) {
+                set $weekend "yes";
+        }
+
+        location = /is_weekend.html {
+                return 200 $weekend ;
+        }
+
+################### rewrite rules ##############################
+# password-reset.html
+
+#       rewrite /password-reset.html /change_password.html ;
+
+        location = /change_password.html {
+                return 302 /password-reset.html  ;
+        }
+
+##################### try_files ###############
+#
+#       try_files $uri /change_password.html /404.html ;
+
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+        }
+    }
+
+# Settings for a TLS enabled server.
+#
+#    server {
+#        listen       443 ssl http2;
+#        listen       [::]:443 ssl http2;
+#        server_name  _;
+#        root         /usr/share/nginx/html;
+#
+#        ssl_certificate "/etc/pki/nginx/server.crt";
+#        ssl_certificate_key "/etc/pki/nginx/private/server.key";
+#        ssl_session_cache shared:SSL:1m;
+#        ssl_session_timeout  10m;
+#        ssl_ciphers PROFILE=SYSTEM;
+#        ssl_prefer_server_ciphers on;
+#
+#        # Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+#
+#        error_page 404 /404.html;
+#        location = /404.html {
+#        }
+#
+#        error_page 500 502 503 504 /50x.html;
+#        location = /50x.html {
+#        }
+#    }
+
+}

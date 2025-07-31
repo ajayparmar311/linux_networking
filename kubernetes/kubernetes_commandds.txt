@@ -1,3 +1,98 @@
+The type 1 hypervisor sits on top of the bare metal server and has direct access to the hardware resources. Because of this, the type 1 hypervisor is also known as a bare metal hypervisor. In contrast, the type 2 hypervisor is an application installed on the host operating system.
+
+VMware hypervisors like vSphere, ESXi and ESX.
+Microsoft Hyper-V.
+Oracle VM Server.
+Citrix Hypervisor.
+
+openshift is redhat PaaS (plateform as a server)
+openshift is a Redhat container application plateform
+openshift origine is based on top of docker containers and kubernetes cluster manager with added developer and operational centric tools that enable repid application developement , deployment and lifecycle management
+
+openshift can intigrate with : 
+	- SCM (source code manager) like git,github
+	- pipeline
+	- registry
+	- repository
+	- software defined networking 
+	- api
+	- governance
+	
+containers are completely isolated env. as they can hve there own process , network interfaces , services just like VM except conatiners share same os kernel.
+
+hardware  <--> OS kernel linux <--> software
+
+
+OS kernel linux --> ubuntu os ---> docker --> any container with sane linux flaver
+
+
+
+hardware -> os -> docker -> container 1 (application - libs,dependncy) ]
+							container 2 (application - libs,dependncy)	]
+
+hardware -> os -> hypervisor -> VM [ OS 1 -> (application -  libs,dependncy) ]
+								   [ OS 2 ->(application - libs,dependncy)   ]
+							 ->  high utilization as multiple Os and kernel running
+							 -> more memory size consuption
+							 -> high boot time
+
+docker run ansible
+docker run nginx
+docker run redis
+docker run nodejs
+
+docker images :
+		-  package, tamplate , plan :  it is similer as VM config file from vagrant or ansible playbooks
+		
+orchestration technologies :
+	-  docker swarm
+	-  kubernetes
+	-  MESOS by apache
+	
+	
+OCR : openshift container registry
+
+how to install local minishift setup on Virtualbox 
+	- download binary from git :
+		https://github.com/minishift/minishift/releases
+		https://github.com/minishift/minishift
+	- then extract and run the command : 
+		- minishift config set docker-opt "add-registry=quay.io"
+		- 	minishift start
+	- we can delete minishift by CMD below : 
+		- minishift delete --force --clear-cache
+		
+18002081800
+
+get the token : 
+oc whoami -t
+oc get porjects
+oc get users
+oc adm policy add-cluster-role-to-user cluster-admin <username>
+
+rest call for OKD : 
+	- generate auth tokan : 
+		oc whoami -t
+	-Run below curl command
+		curl -k  https://192.168.99.102:8443/oapi/v1/users -H "Authorization: Bearer 8s8Qm56yjKflkpDDXVnsu4xLf6q1jHKTDLcNpCgNvW8"
+
+
+so in kubernetes we can deploy application as an docker-container where container are created from docker images of the application ,
+Images can we pulled from globel docker registry or from openshift container regisrty(OCR) which comes built in OKD
+
+so we can either deploy a pod or multiple pod in deployements and er can expose this pod or deployment with the help of services.
+
+
+so if we see kubernetes or OKD has two main component :
+	- master -  
+		it is the actually a manager of kubernetes which has api server, schedules ,ETCD, controler etc.
+	- worker - 
+		on worker node the actual docker images are hosted and this nodes are managed by single or multiple master nodes 
+
+in OKd we can build  image with :
+	- docker file 
+	- source-To-Image(S2I)
+
 kube arch:
 
 Master nodes:
@@ -237,7 +332,7 @@ spec:
     matchLabels:
       name: elasticsearch-pod
   template:
-    metadata:
+    metadata: 
       labels:
         name: elasticsearch-pod
     spec:

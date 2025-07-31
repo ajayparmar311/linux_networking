@@ -1,0 +1,1402 @@
+https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances:
+
+
+vagrant comamnd :
+	1 :  if you have vagrant file then u can just start the vm 
+		- vagrant up
+	2 :	 one the machine started u can ssh to it .
+		-  vagrent ssh <mahcine name>
+	3 : login with ssh client directly. you will need private key of the machine . and if u have created VM from vagrant then you will get the private key under (.vagrant/machines/<machine_name>/virtualbox/private_key) path 
+		- ssh -i <private key path> <sarver_user>@<server_ip>
+	4 : To reboot an Ubuntu VM managed by Vagrant, you can use the following commands:
+		- vagrant reload
+		- sudo reboot : if u are already sshed into machine
+
+		
+kops create cluster --name=kubevpro.ajayparmar.xyz \
+> --state=s3://vprofile-kops-state311 --zones=us-east-2a,us-east-2b \
+> --node-count=2 --node-size=t3.small --master-size=t3.medium \
+> --dns-zone=kubevpro.ajayparmar.xyz --node-volume-size=8 --master-volume-size=8
+
+kops update cluster --name kubevpro.ajayparmar.xyz --state=s3://vprofile-kops-state311 --yes --admin
+
+
+
+
+The server is accessible via web console at:
+    https://192.168.99.102:8443/console
+
+You are logged in as:
+    User:     developer
+    Password: <any value>
+
+To login as administrator:
+    oc login -u system:admin
+
+
+-- Exporting of OpenShift images is occuring in background process with pid 3204.
+
+
+
+git repo.
+git config --global core.autocrlf false # if it shows any working like : (warning: in the working copy of 'README.md', LF will be replaced by CRLF the next ti)
+
+git config user.name "ajay"
+git config user.email "ajayp.parmar311@gmail.com"
+
+echo "# networkclass" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/ajayparmar311/networkclass.git
+git push -u origin main
+ 
+externel repository : 
+	- github
+	- gitlab
+	- bitbucket
+	
+git remote add origin <connection string> 	#  TO add remote repository
+git remote -v 								#  To List all repository
+git push -u origin master 					#  To push file to remote repo
+
+
+git restore <filename> 		# To discaard changes in working dir
+git log 		# to see logs
+git log -n 1	# to check mentioned number of log
+git log --name-only 	# to check file name 
+git log --oneline		# show details in one line
+git log --graph --decorate	
+
+git stash: Saves all the modified files temporarily
+git stash list: Lists all the stashed sets
+git stash apply: Applies the latest stashed content
+git stash pop: Applies the latest stashed set and drops it
+git tag: Adds a tag to a commit
+git tag -a -m: Adds an annotated tag with a message
+git push tag name: Pushes tag to the remote repo
+
+
+Syntax: git submodule add <URL of vendor library>
+Example: git submodule add https://github.com/doctrine/some-library.git
+
+git submodule add <URL>: Adds a submodule to the project.
+git submodule status: View status (working, staging, or indexed files) of all the submodules.
+git submodule update: Updates submodules after switching branches.
+git submodule update --init: After cloning a new repo, if you need to add submodules to it from .gitmodules file, use this command.
+git submodule update --init --recursive: If the submodules inside a newly cloned repo are nested, then use this.
+git submodule update --remote: Pulls all changes in the submodules.
+
+
+Introduction to Git Blame
+
+git blame helps you in such circumstances.
+Syntax: git blame <filename>
+Example: git blame index.html
+
+git blame <options> <filename>
+
+Options:
+
+-L to filter based on line numbers
+-s to suppress the author's name and timestamp from the output
+-e to show the author's email instead of the author's name
+-f to show the filename in the original commit
+-n to show the line number in the original commit
+Example: To find the author of lines 5 to 7 in the file Readme.md, one can use:
+
+git blame -L 5,7 Readme.md
+
+You can use git bisect log to find the flow of Git Bisect, that is, to see what has been done so far.
+If you find something wrong, then you can use git bisect reset.
+
+git bisect start - To start Git Bisect
+
+git bisect good - To declare that the commit is good
+
+git bisect bad - To declare that the commit has an error
+
+
+git hook : this will be availabe under .git/hook/ folder u can right script in this folder to automate some task
+
+git reflog   - this is used to check th delete file
+
+git cherrypick (Moving commits between branches)
+
+git stash (Saving changes temporarily)
+
+git submodules (Adding a subproject)
+
+git Blame (Finding the author of a line)
+
+git Bisect (Finding the commit which introduced a bug)
+
+git reflog (Retrieving deleted commits)
+
+git hooks (Automating things using script)s 
+
+
+
+git branch <branch name> 		# to create a branch
+git checkout <branch name>		# to switch to a branch 
+git checkout -b <branch name> 	# to create branch and swich to that branch 
+git branch 						# to checek all listed branch local only
+gir branch -a 					# to list all branch local and remote 
+git branch -d <branch name> 	# To delete a branch 
+
+git merge <branch_name>
+
+step togather
+	- git fetch origin master			# to fetch changes in local repo
+	- git merge origin/master			# to fetch changes in local repo
+we can perform above task in one command : 
+	- git pull origin master
+
+################ user management #######################
+
+chage <username>
+chage -l <username>
+/etc/login.defs  ---- default setting for users
+/etc/pam.d/system-auth  --------need to check
+
+file read permission : 
+
+4 = r (read)
+2 = w (write)
+1 = x (execute)
+
+
+
+######## WEbsites for linux related commands  ###############
+
+-- to install any server on linus deb or RHEL
+https://www.server-world.info/en/note?os=Ubuntu_20.04&p=ftp&f=4
+
+ 
+
+#################### Download repository ###################
+
+sudo yum install epel-release
+
+#####################################################################
+
+linux commands :
+
+----- how to search installed packages in linux
+--- For RHEL : 
+	-- How to list all installed : rpm -qa
+	-- How to install from yum : yum install <package name>
+	-- how to install pkg from rpm : rpm -hiv <rpm file>
+	-- how to uninstalled pkg from rpm  :  rpm -e <installed package name>
+	-- to clean cache : yum clean all
+	-- to check all repo : yum repolist all
+	-- To check information of the package : rpm -qi <package name>
+	-- to check config file details of the pkg : rpm -qc <package name>
+	-- find the pkg name from the command : which <CMD> | rpm -qf
+	-- how to get the <id>  for the below command : yum history
+	-- Undo the installed package : yum history undo <id>
+	-- update command will preserve the old package : yum update
+	-- upgrade will delete old version or the obsolate package : yum upgrade
+--- For DEB : 
+	-- How to list all installed : apt list --installed
+	-- how to install from rpm : rpm -hiv <rpm file>
+
+########  To check for all version of any command 
+--- snap info <CMD name>
+example : snap info curl
+
+
+
+ls -l /etc/yum*
+yum list <package-name> --> to get if package is installed or not
+yum remove <package-name> --> to remove installed package
+yum --showduplicates list <pkge-name> - to get all available version
+yum repolist   --> t get repo list
+rpm -i telnet.rpm  --> use to install package
+rpm -e telnet.rpm  --> use to uninstall package
+rpm -q telnet.rpm  --> use to query package
+
+mkdir -p /test/check/main/india   // thi command will  create all dir if not exist
+yum group list   /// compilation tool
+yum groupinstall ''
+curl -I http://192.168.1.25/index.html
+man | man -k 
+apropos <string or command> : apropos - search the manual page names and descriptions
+type
+which <command name>
+ncal
+date
+help
+pwd
+lasts
+curl ifconfig.media  ==> To get public ip
+netstat -rvn // show gateway details
+netstat -tunlp // show all the open port
+ss -napt // utility to investigate socket
+stat <filename>  // this command will show status of the file
+host - DNS lookup utility
+systemctl list-units | grep -i firewall   ==> to search service in systemd
+
+lscpu  ==> to get system details like no of CPU mem, sockets etc
+nproc  ===> give number of processor
+
+ulimit -n	==> To check open file limit 
+
+----- %%%% check processing issue %%%%%--------
+
+####### LOG ###
+
+-- /var/log/secure
+	-	This file contains the user login and exit details along with remote client address
+	- Like : Accepted password for ajay from 192.168.1.19 port 63142 ssh2
+-- /var/log/audit/audit.log
+	- contains systemd audit . like service start stop . user login exit audit log
+-- /var/log/messages
+	- contain system session logs . login session log
+-- /var/log/wtmp
+	-	Also holds the login details 
+
+
+df -hv | grep -v tmpfs
+du -a OR du -h OR du -ah / OR du -ah <dir-path>  ==>> to get file zise
+free -m	: free - Display amount of free and used memory in the system
+top : top - display Linux processes
+lsmem : lsmem - list the ranges of available memory with their online status
+/proc/meminfo    ===>> memory info file 
+vmstat ==> vmstat - Report virtual memory statistics
+pmap <process-id> ===> report memory map of a process
+dmidecode ===>  dmidecode - DMI table decoder
+lscpu  OR /proc/cpuinf ===> display information about the CPU architecture
+
+----- %%%% check disk issue %%%%%--------
+iostat -y 5 ===> Report Central Processing Unit (CPU) statistics and input/output statistics for devices and partitions.
+lsof ===> list open files
+
+----- %%%% check networking issue %%%%%--------
+
+-- ifconfig	===> all interfaces status 
+-- ethtool <interface-id> =====> ethtool - query or control network driver and hardware settings
+-- mii-tool enp0s3  ===>  mii-tool - view, manipulate media-independent interface status
+--  ifup <interface-id> and ifdown <interface-id>  ==> command to up and down interfaces
+-- configuration files for network :
+	-	/etc/NetworkManager/system-connections/
+-- systemctl restart network
+
+
+tcpdump -i <interface-id like:enps03> ===> dump traffic on a network
+
+lsof -i -P -n | grep -i listen   ==> listining sockets / listning port to check if our machine is listning on specific port or not 
+
+netstat -plnt ==>  netstat  - Print network connections, routing tables, 
+interface statistics, masquerade connections, and multicast memberships
+
+ss -plnt  ===> ss - another utility to investigate sockets
+
+iftop  ===> iftop - display bandwidth usage on an interface by host
+		please install it :
+			-	yum install epel-release
+			-	yum install iftop
+
+----- %%%% check check other tools %%%%%--------
+
+htop, pcp-htop =====>>> interactive process viewer
+iotop ===> simple top-like I/O monitor
+iptraf-ng ====> IPTraf is a console-based network monitoring utility. IPTraf gathers data like TCP connection packet and byte counts, interface statistics and activity indicators, TCP/UDP traffic breakdowns, and LAN station packet and byte counts. iptraf-ng is a fork of iptraf.
+psacct ===> psacct or acct both are open source utilities for monitoring users’ activities on the Linux system. These utilities run in the background and keep track of each user’s activity on your system as well as what resources are being consumed.
+
+----- %%%% remove unnecessoary or orphan package %%%%%--------
+
+-- To get list of all package :
+	-	rpm -qa | grep -i <packagename> (centos/RHEL)
+	-	apt list --installed | grep -i <package-name> (ubuntu)
+
+-- To delete package:
+	-	rpm -e <package-name>
+	-	apt-get remove <package-name>
+	
+-- built-in utility <yum-utils> whhich allows you to check for orphaned pkg
+	-	check if that utility is installed in or not.
+		-	 rpm -qa | grep -i yum-utils
+	-	if not installed Then install it :
+		-	yum install yum-utils
+-- Get list of all orphan package:
+	-	package-cleanup --leaves
+-- to remove all orphan pkg :
+	-	yum remove `package-cleanup --leaves` (RHEL)
+	-	apt-get autoremove
+	
+		
+
+
+
+
+
+https://github.com/mmumshad/kubernetes-the-hard-way
+
+this below  command will create a log file which will record current session activities 
+--- script testlog.log
+
+
+to update ssh port in firewall CMD below:
+sudo ufw allow ssh
+
+##below file is used to control user login defaults
+/etc/login.defs
+
+# to communicate with linux users we use below commands
+
+users -- to find out number of users logged into the machine
+wall --- to broadcast any msg to all the users
+write -- to write msg to any specific user (writer <username>)
+
+
+#### systemctl commands 
+
+systemctl start|stop|status|reload servicename.servicename
+
+to add service under systemctl management
+--- Create a unit file in : /etc/systemd/system/servicename.service
+
+To control system with systemctl
+		systemctl poweroff
+		systemctl halt
+		systemctl reboot
+		
+
+### Kill command 
+
+kill <PID>
+kill -1 <PID>  -- to restrt service
+kill -2 <PID>
+kill -9 <PID> -- forcefully kill the process
+kill -15 <PID> -- kill a process gracefully
+killall -- kill alll process
+pkill --kill process by it name
+
+
+
+to schedule any task we can use : 
+
+crontab -- to schedule for daily 
+at -- to schedule for single time
+
+
+
+#### process management #####################
+
+to run process in backgroud: 
+
+--- first run the commandn like : sleep 100
+--- then press control-z : that will stop the running process 
+--- you can check stopped process by ===   jobs ===== command 
+--- then you can put the process in backgroud by === bg === command
+--- if you want to bring back the same command in forground then type === fg ===
+
+To run a process in backgroud and also after closing the ternminal 
+--- we use === nohup ===  command 
+--- Example :  nohup sleep 100 > /dev/null 2>&1 &
+
+To run any process on priority
+--- we use === nice === command
+--- nice scale goes to -20 to 19  the lower number gets more priority 
+--- example : nice -n 5 process (nice -5 sleep 100)
+
+
+
+############## system monitoring command #################
+
+--- top 
+--- df  ==> disk partition details
+--- du  ==>file size
+--- dmesg ==> system related hardware and interpritor logs
+--- iostat ==> system disk input output reports 
+--- netstat ===>  netstat -rnv  - Print network connections, routing tables, interface statistics, mas‐querade connections, and multicast memberships (addition command :  ss, ip route, ip -s link, ip maddr)
+-- free ==> show us the phy memory 
+-- cat /proc/cpuinfo ==> gives us CPU info
+-- cat /proc/meminfo ==> gives us memory info
+
+################ Finding system information #################
+--- uname -a
+--- dmidecode 
+
+############ How to reset root passowrd ?  
+
+####### how to see environment veriable #################
+
+---printenv or env or export
+-how to set env 
+--- export name=ajay
+--- echo $name
+
+--- to set env we can update values in our home dir hidden file .bashrc
+---  OR to set veriable globally we can use file ==> /etc/profile or /etc/bashrc
+
+
+
+
+###### Set special permission this will only work on C program executable #######
+
+-- to add or remove special permissions at the user level
+setuid ===> chmod u+s xyz.sh
+			chmod u-s xyz.sh
+			
+setgid ===> chmod g+s xyz.sh
+			chmod g-s xyz.sh
+			
+-- To find all setuid and setgid in linux
+find / -perm /6000 -type f
+
+############ asigne sticky bit to dir to protect it from deleteing by any other user if that dir has all permission 777 example /tmp dir in / (root)
+
+chmod +t xyz
+
+####################### Network Switch ############################
+
+---------- %%%%%%% Network commands %%%%%%% -------------
+
+ifconfig   ===> to check all interfaces details
+ifdown <interface-id>  ===> to disable interface
+---- Restart network service
+systemctl restart network.service
+
+-- to find network interfaces 
+   -- lshw -class network
+-- interface detection
+-- Assigning an IP address
+-- interface configuration files
+	- /etc/nsswitch.conf     ==> where it should resolve its host addr to ip address
+	- /etc/host
+	- /etc/sysconfig/network ==> in RHEL to set static ip
+	- /etc/netplan/01-network-manager-all.yaml==> in ubuntu to change staticip
+	- /etc/sysconfig/network-scripts/ifcfg-nice
+	- /etc/resolve.conf ==> DNS entry
+
+------ network commands------
+ping <host ip> ==> is to test host connectivity
+ifconfig   ==> to check interfaces details 
+ifup and ifdown  ==> command to up and down interfaces
+netstat -rnv  ==> show us the ip route details with gateways nad mask
+tcpdump ==> command will show all input out from interface
+nslookup <path or ip address> ==> lookup DNS server entry of the given domain
+
+
+
+####  NIC Bonding ###################### 
+
+this is IMP topic PDF is attched along the doc to create NIC Bonding (Creating-NIC-Bonding.pdf)
+-- 	NIC : Network interface card
+
+-- NetworkManager TOOL : GUI, nmtui and nmcli
+
+we can create network bonding from below tools
+
+nmtui : provide UI for networkmanager to edit networke setting in terminal
+nmcli : refers to networkmanager command line interface with no UI
+nm-connection-editor : A full network graphical management tool . provide access to most of the NetworkManager configuration options
+GNOME settiogs :
+
+-------### nmcli ###--------------
+
+nmcli : command to update ip address or assign static ip address to interface
+-- nmcli device status  ## is to check all interfaces status on device
+-- nmcli connection show  -active  ## is to check active interfaces
+
+--  nmcli connection modify <interfaceid> ipv4.addresses <static IP>
+example :  nmcli connection modify wlp3s0 ipv4.addresses 192.168.1.52/24
+
+--  nmcli connection modify <interfaceid> ipv4.gateway <static IP>
+--  nmcli connection modify <interfaceid> ipv4.method <manual>
+--  nmcli connection modify <interfaceid> ipv4.dns <static IP>
+--  nmcli connection down <interfaceid>
+--  nmcli connection up <interfaceid>
+--  ip addr show <interface id>
+
+### add secendory static ip
+-- nmcli connection modify <interface name> +ipv4.addresses <secondary ip>
+-- nmcli connection reload
+-- systemctl reboot
+-- ip addr show
+
+
+################ rsync command ###########################
+
+rsync - a fast, versatile, remote (and local) file-copying tool 
+mainly used for backup and mirroring.
+
+---- inatall rsync ------
+RHEL : yum -y install rsync
+DEB : apt -y install rsync
+
+port: 22 (same as SSH)
+
+---- sync a file on a local machine 
+-- create a backup file 
+tar cvf backup.tar .
+-- create a backup folder 
+mkdir /tmp/backup
+-- rsync CMD
+- syntex :  rsync -zvh <backup file> <backup destination path>
+rsync -zvh backup.tar /tmp/backup/
+
+---- sync a dir on local machine
+-- rsync CMD 
+- syntex :  rsync -azvh <backup source dir path> <backup destination dir path>
+rsync -zvh /home/ajay/ /tmp/backup/
+
+---- sync a file to remote machine
+-- rsync CMD 
+- syntex :  rsync -azvh <backup file> remoteuser@<ip>:<remote destination dir>
+rsync -avz backup.tar ajay@192.168.1.51:/home/ajay/
+
+
+---- sync a file from remote machine
+-- rsync CMD 
+- syntex :  rsync -azvh  remoteuser@<ip>:<remote dir> <local machine dir>
+rsync -avz ajay@192.168.1.51:/home/ajay/nohup.out /home/ajay/
+
+
+################ DNS SETUP ####################
+refer PDF doc : 3-DNS.pdf from git : 
+
+1 -- Install DNS package 
+yum install bind bind-utils -y
+
+
+
+to update dns entry in client :  https://infotechys.com/change-dns-settings-using-the-nmcli-utility/
+
+nmcli connection modify enp0s3 ipv4.dns "192.168.56.11"
+
+#################   NTP (Network Time Protocol) / chronyd #################
+
+NTP port : 123
+yum install ntp
+yum install chrony
+
+##################  timedatectl #########
+
+timedatectl command shows/change date , time and timezone 
+it synz time with NTP server also  
+------- commands
+-- timedatectl
+	To list timezone
+-- timedatectl list-timezone
+   To set timezone
+-- sudo timedatectl set-timezone "Asia/Kolkata"
+   to set date 
+-- sudo timedatectl set-time YYYY-MM-DD 
+   to set auto time sync with remote NTP server
+-- timedatectl set-ntp true
+
+################### sendmail ######################
+
+ send and recive emails
+-- files 
+	/etc/mail/sendmail.mc
+	/etc/mail/sendmail.cf
+	/etc/mail
+	
+-- service 
+	systemctl start sendmail
+
+-- command 
+	mail -s "subject line" <emailadd@xyz.com>
+
+################ httpd ######################
+
+-- Files 
+	/etc/httpd/confg/httpd.conf
+	/var/www/html/index.html
+-- logs
+	/var/log/httpd/
+
+#################### rsyslog ###############
+
+-- Generate log or collect logs from other servers
+-- service or pkg name : rsyslog
+-- config file : /etc/rsyslog.conf
+-- service :
+	systemctl start rsyslog
+	systemctl enable rsyslog	
+	
+#################### Server hardening #######################
+
+- user Account 
+- remove un-wanted pkg
+- stop un-used services : systemctl -a (check for active and inactive srvc)
+- check on listening port : netstat -tunlp
+- secure ssh configuration : /etc/ssh/sshd_config
+- enable firewall : /etc/firewalld/firewalld.conf
+- enable SELinux : sestatus :  /etc/sysconfig/selinux : stat <filename>
+- change listebing services port number
+-keep your OS up to date (security patching)
+
+
+####################### SSH ############################
+
+Configure idel timeout interval
+Avoid having and unattened SSH session , we can set an idel timeout interval
+
+- Become root
+- edit : /etc/ssh/sshd_config file and add following line
+	ClientAliveInterval 600
+	ClientAliveCountMax 0
+systemctl restart sshd
+
+-----#### Disable root login ####---------
+
+This should be done at the initial time of setting system
+
+- become root
+- edit : /etc/ssh/sshd_config file and replace PermitRootLogin yes to no
+- PermitRootLogin no
+-systemctl restart sshd
+
+-----#### Disable empty password ####---------
+
+We need to prevent remote logins from accounts with empty passwords for added security
+
+- become root
+- edit : /etc/ssh/sshd_config file and uncomment following lines
+- PermitEmptyPassword no
+-systemctl restart sshd
+
+
+-----#### Limit user's SSH access ####---------
+
+We should limit our SSH logins to only certain users who need remote access
+
+- become root
+- edit : /etc/ssh/sshd_config file and add below line
+- AllowUsers <user1> <user2> .....
+-systemctl restart sshd
+
+
+-----#### Use a diffrent port for SSH ####---------
+
+By default SSH port runs on 22. Most hackers looks for any open SSH server with port 22 and changing default port can make system much more secure.
+
+- become root
+- edit : /etc/ssh/sshd_config file and change
+- Port 22 // this is a default setting change this to any uavailable port 
+-systemctl restart sshd
+
+
+
+------ $$$$$$$ Access remote server without password $$$$$$$ ------
+=>  Two reasons to access a remote machine
+	- Repetitive logins
+	- Automation through scripts
+	
+=>	Keys are generated at user level
+	- <vagrant> : user level
+	- root level
+
+=> First we generate keys at clinet side and share that auth keys to server side
+	- CMD to generate keys : 
+		-- ssh-keygen
+	- CMD to copy keys to server  
+		-- ssh-copy-id <user>@<serverip>
+	- cmd to login from client to server
+		-- ssh <server-user>@<server-ip>
+		-- ssh -i <server-user> <server-ip>
+	
+
+#########   cockpit ##############
+
+server administration tool with web based interface
+
+-- check if it exist : 
+	- rpm -qa | gre -i cockpit
+-- Install if not exist :
+	- yum/dnf/apt-get install cockpit 
+-- Start service 
+	-  systemctl start cockpit
+-- check the status 
+	- systemctl status cockpit
+-- Access the web interface : 9090 is default port for cockpit
+	- http://<server-ip>:9090
+
+
+
+#################  Firewall ##############################
+
+-- There are two tools to manage firewall 
+	- iptables 			: comes in older linux versions and still in use
+	- firewalld			: newer version came from centos 7 and above
+
+========>>>> 1. WORKING WITH iptables
+
+-- before working with iptables. make sure to disable and stop firewalld if it is running.
+	- service OR systemctl stop firewalld
+	- systemctl disable firewalld
+	- systemctl mask firewalld : to prevent it from running byother program
+
+-- now check if we have iptables-serices package installed:
+	- rpm -qa | grep -i iptables-services
+	- IF above package is not installed the install it 
+		-  yum install iptables-services
+	- Then start and enable iptables services
+		- systemctl start iptables
+		- systemctl enable iptables
+	- Now you can check iptables rule
+		- iptables -L
+	- To flush iptables.
+		- iptables -F
+---------------------------------------------------------------------------
+
+========>>>> 2. WORKING WITH firewalld
+
+-- link to firewalld related commands
+https://www.printsupportcenter.com/hc/en-us/articles/360000689849-CentOS-Firewall-settings
+
+-- firewalld command : firewall-cmd
+
+-- firewalld also has the following :
+	- table		: contains all in of chains rules and targets		
+	- chains	: contains INPUT, FORWORD ,OUTPUT target for information
+	- rules		: 
+	- targets	: DROP, REJECT OR EXCEPT the information
+
+--	make sure to stop,disable and mask iptables service
+	- systemctl stop iptables
+	- systemctl disable iptables
+	- systemctl mask iptables
+
+-- check if firewalld pkg is present and installed or not
+	-  rpm -qa | grep -i firewalld
+
+-- start and enable firewalld service
+	- systemctl start firewalld
+	- systemctl stop firewalld
+
+-- check firewalld rules
+	-  firewall-cmd --list-all
+
+-- get the list of all services firewalld is aware of:
+	-  firewall-cmd --get-services
+	- To get specific service:
+		- firewall-cmd --get-services  | awk '{for(i=1 ;i < NF ; i++) {if($i=="ssh")print $i,NF}}'
+-- to make firewalld reload it config
+	- 	firewall-cmd --reload
+-- To get the multiple zone
+	- 	firewall-cmd --get-zone
+-- To get active zone:
+	- 	firewall-cmd --get-active-zones
+-- All services are pre-defind by firewall. what if we want to add 3rd party service.
+	- /usr/lib/firewalld/services/ : in this folder you will get all the default serice xml files (Individual files)
+	- you can copy any file from the existing .xml file and can create new files
+	- default xml file format :
+		<?xml version="1.0" encoding="utf-8"?>
+		<service>
+		<short>SSH</short>
+		<description>To login </description>
+		<port protocol="tcp" port="22"/>
+		</service>
+		-	RESTART firewalld : systemctl restart firewalld
+	-  To add and remove service to firewall :
+		-	firewall-cmd --add-service=<service-name defined in xml file>
+		-	firewall-cmd --remove-service=<service-name defined in xml file>
+		- 	EACH TIME WHEM YOU ADD OR REMOVE SERCVICE YOU NEED TO RELOAD 
+			-	firewall-cmd --reload
+	-  To add and remove service to firewall :
+		-	firewall-cmd --add-service=<service-name defined in xml file> --permanent
+		-	firewall-cmd --remove-service=<service-name defined in xml file> --permanent
+		- 	EACH TIME WHEM YOU ADD OR REMOVE SERCVICE YOU NEED TO RELOAD 
+			-	firewall-cmd --reload
+	-  TO ADD PORT :
+		-	firewall-cmd --add-port=<port>/tcp
+		-	firewall-cmd --remove-port=<port>/tcp
+	-  TO REJECT INCOMING TRAFIC FROM AN IP ADDRESS :
+		- firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.1.51" reject'
+	-  TO BLOCK AND UNBLOCK ICMP INCOCMING TRAFIC
+		- firewall-cmd --add-icmp-block-inversion
+	-  TO BLOCK OUTGOING TRAFIC TO SPECIFIC WEBSITE/IP ADDRESS :
+		- first get the IP address :
+			- host -t a www.facebook.com
+		- to add : 
+			sudo firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -d 163.70.143.35 -j DROP
+		- To remove :
+			sudo firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 0 -d 163.70.143.35 -j DROP
+
+###############  Tune System performance #####################
+-- Check if the tuned pkg is installed or not 
+	-  rpm -qa | grep -i tuned
+-- if not install the service :
+	-  yum install tuned
+-- stert and enable the service:	
+	-	systemctl start tuned
+	-	systemctl enable tuned
+-- command to change setting of tuned daemon
+	- tuned-adm
+-- To check which profile is active
+	- 	tuned-adm active
+-- to list availabe profile
+	-	tuned-adm list 
+-- To chenge to desired profile:
+	-	tuned-adm profile <profile-name>
+-- check for tuned recommendation :
+	-	tuned-adm recommend
+-- turn off tuned setting daemon
+	-	tuned-adm off
+-- change profile through web console :
+	-	login to https://<ipaddr>:9090		==> cockpit web app console
+	-	Go to :	overview  ==> configuration  ==> performance profile
+	
+-- we can set priority manually by nice and renice command
+	- TO set the process priority:
+		- nice -n <number of priority B/W -20(hightest) to 19> <process name>
+	- To change the process priority:
+		- renice -n <no. of priority B/W -20(hightest) to 19> <process name>
+-- Process priority can be viewed through ps CMD given below
+	-	ps axo pid,comm,nice,cls --sort=-nice
+
+
+##################  Kickstart (automate linux installation) #################
+
+-- To use kickstart you must use: 
+	- choose a kickstart server and create/edit kickstart file
+	- make the kickstart file availabe on the network location
+	- make the installation source availabe
+	- make boot media available for client which will be used to begin   	installation	
+	- start the kickstart installation
+-- CentOS / RedHat :
+	- kickstart program can be downloaded which allows you to define parameters through the gui.
+		- yum install system-config-kickstart <this will not work in RHEL 8 and above>
+	- or you can use the installation kickstart file .which was created during the first installation
+		- anaconda-ks.cfg
+
+--	WE will use anaconda-ks.cfg installation kickstart file and make the nesessory changes
+
+-- make sure httpd pkg is installed . if not then install the pkg 
+	- rpm -qa | grep -i http
+	- yum/dnf install httpd
+	- systemctl start httpd
+	- systemctl enable httpd
+
+-- copy anaconda-ks.cfg file to httpd folder
+	- cp /root/anaconda-ks.cfg /var/www/html/
+	- set the read permission:
+		- chmod a+r /var/www/html/anaconda-ks.cfg
+	- add httpd port 8080 inti firewall
+	- check SELinux : sestatus
+	- check file through browser : http://<serverip>/anaconda-ks.cfg
+
+############### DHCP (dynamic hostname configuriton protocol) ########
+
+we can create centOS machine(server) as an DHCP server
+
+-- install DHCP server pkg 
+	- for centOS 7 : 
+		- yum install dhcp
+	- For centOS 8 and above :
+		- yum install dhcp-server
+-- edit the config file :
+	- vim /etc/dhcp/dhcp.conf
+	- OR we can copy it from :
+		- cp /usr/share/doc/dhcp-x.x.x/dhcpd.conf.example /etc/dhcp/dhcp.conf
+-- Then start and enable the service :
+	- systemctl start dhcpd
+	- systemctl enable dhcpd
+	
+
+################  SYSTEM RUN LEVEL ########################
+
+in linux we have 6 system run level.
+
+-- main run level.
+	- init 0  ==> Shutdown or halt the system
+	- init 1 (init s OR S)  ==> single user mode , usually alised as s or S
+	- init 6  ==> reboot the system
+-- Other run level
+	- init 2  ==> multiuser mode without networking
+	- init 3  ==> multiuser mode with networking
+	- init 5  ==> multiuser mode with networking and GUI
+	
+-- commend to check with run level are you currently in :
+	-	 who -r
+	
+################# Computer boot process ######################
+
+BIOS : basic input and output system
+BIOS installed on ROM
+CMOS : complementoy metal-oxide semiconductore : CMOS has BIOS settings including systemtime,date as well as hardware setting
+POST : Power on self test ==> this will test all system hardware part. if those are running or not 
+DISK block MBR (Master boot record) : this has information of the OS.
+---------- The above whole process is called as bootstrap -------------
+
+################# linux boot process ######################
+
+------------ %%%%% OLD linux BOOT Process %%%%% -------------
+
+when we press power button to start computer : 
+it first goes to BIOS and run bios process and execute MBR ====> then MBR(which is a first block of HDD) which execute GRUB ====> GRUB is (Grand Unified BootLoader) which loads the kernel (config file path /boot/grub/grub.com) and execute kernel  ====> kernel executes /sbin/init program ====> init execute runlevel programs (0,1,2,3,5,6) ====> run level programs are executed from /etc/rc.d/rc*.d
+
+--	for newer version of linux runlevel settings are defined as :
+	-	path : /etc/systemd/system/default.target
+	-	To set new default run-level run:
+		-	systemctl set-default <new target>
+	-	Older version of linux = /etc/inittab
+	
+------------ %%%%% New linux BOOT Process %%%%% -------------	
+
+when we press power button to start computer : 
+--
+it first goes to BIOS and run bios process and POST(power-on-self-test) and execute MBR ====> then MBR(which is a first block of HDD) which execute GRUB2 ====> GRUB2 is (Grand Unified BootLoader v2) which loads the kernel (config file path /boot/grub2/grub.cfg) and execute kernel  ====> kernel(core of operating system) loads required drivers from initd.ing then  /sbin/init -> ../lib/systemd/systemd  start the first OS program(systemd) ====> systemd=(system daemon (PID #1)) : it then start all the required processes , which reads /etc/systemd/system/default.target to bring the system to run-level Total of 7 run-level (0 to 6) 
+	
+
+##################### Message of the day #############################
+--	File Location 
+	-	/etc/motd
+	-	you can change it as per your notic:
+		- vim /etc/motd
+
+-- Customize message of the day :
+	1 - create new file in /etc/profile.d/
+		-	/etc/profile.d/motd.sh
+	2 - modify the /etc/ssh/sshd_config file to edit
+		-	#PrintMotd yes to PrintMotd no
+	3 - Restart sshd service	
+		-	systemctl restart sshd.service
+	
+	
+#################### Computer storage #########################
+
+Type of computer storage:
+	- Local storage : RAM,HDD,SSD
+	- DAS (Direct Attched Storage) :  CD ,DVD,flash drive
+	- SAN (Storage Area Network)
+		- storage attched through iSCSI or fible cable
+	- NAS (Network attached Storage)
+		- Storage attached over network(TCP/IP)
+		- Example : SAmba,NFS etc
+
+-------------%%%%%%%% DISK Partition %%%%%%%%%-------------------
+
+-- df - report file system disk space usage
+	- df -h 
+-- fdisk - manipulate disk partition table
+	- fdisk -l
+-- you can add the disk space and check with ==> fdisk -l
+-- you can now add the disk like : if disk name is : /dev/sdb then type :
+	-	fdisk /dev/sdb ==> then follow the instruction
+-- Now partition has been created like /dev/sdb1, now you can assign file system type
+	-	mkfs.xfs /dev/sdb1
+-- Now we will mount the partition on any mouth path:
+	-	first create the mount path in root(or anywhere)
+		-	mkdir <dir-name>
+	-	Then mount that create dir to partition(or use existing one)
+		-	mount <partition-name> <mount-path>
+			example : mount /dev/sdb1 /data
+	-	Now we can check the partition mount path 
+		-	df -h
+--  to auto mount the partition at boot time
+	-	check file /etc/fstab which has all the entry about partition
+		-	/etc/fstab
+	-	Edit the file and add new partition details
+		- vi /etc/fstab
+-- To unmount the mount path :
+	-	umount <mount-path>
+		example : umount /data_ajay
+-- reload /etc/fstab file to reload the config.
+	- mount -a
+	
+-- How to format partission
+	-- umount the partition from mount path then run below command:
+		-	fsck <partition> / e2fsck <partition>
+			example :  fsck /dev/sdb1
+
+-------------%%%%% LVM (logical volume management) %%%%%%%%%--------------
+
+
+
+Need to go through again
+
+
+
+-------------%%%%% implement advanced storage features %%%%%%--------------
+
+
+	
+	
+
+############ Change file creation permission ################
+
+-- CMD :
+	- umask : CMD to set default  permission of any newly created file/dir
+	- umask u+rw,g+r,o-rwx
+	- we can modify the settings for permanent to edit /home/user/.bashrc file
+	
+
+#######################################################
+####################### NGINX #########################
+#######################################################
+
+What is NGINX : 
+	- is web server :
+		- server web context
+	- can also servers as Reverse proxy server
+		- Load Balancing
+		- Backend routing
+		- Caching
+
+-- Install NGINX
+	- yum install nginx
+	- NGINX configuration file:
+		- /etc/nginx/nginx.conf
+		
+-- Link for NGINX source code :
+	- https://nginx.org/en/download.html
+	- Installation steps : 
+		- https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
+	- wget the stable version of source code Then unzip that.
+	- then we will execute ./configure scrip to configure over source code for build
+		- ./configure
+			-- IF you get error like : ./configure: error: C compiler cc is not found, Then we will install c compiler	
+			-- yum groupinstall "Development Tools"   ==> for centos/RHEL
+			-- apt-get install build-essential		  ==>  For Ubuntu/DEB	 
+			-- now agin test the script 
+				- ./configure
+			-- if you get below WORNING then we need some dependancy packages,
+				- ./configure: error: the HTTP rewrite module requires the PCRE library.
+You can either disable the module by using --without-http_rewrite_module
+option, or install the PCRE library into the system, or build the PCRE library
+statically from the source with nginx by using --with-pcre=<path> option.
+				- Dependancy packages :
+					- yum install pcre pcre-devel zlib zlib-devel openssl openssl-devel  ==> for centos/RHEL 
+					OR
+					- PCRE – Supports regular expressions. Required by the NGINX Core and Rewrite modules.
+						- wget github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.gz
+						  tar -zxf pcre2-10.42.tar.gz
+						  cd pcre2-10.42
+						  ./configure
+						  make
+						  sudo make install
+			-- If you want to run with added configuration : 
+				- ./configure --sbin-path=/usr/bin/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-pcre --pid-path=/var/run/nginx.pid --with-http_ssl_module
+				- Compile and install the build CMD :
+					- make
+					- make install
+				- Start nginx :
+					- nginx
+				- check all nginx commands like start stop reload:
+					- nginx -h
+					
+			-- Configure system service or systemd service for nginx to start/stop/reload/enable : this is availabe since ubuntu 15.0.4 and cenOss 7.0.0 (create init service for nginx) :
+				- systemd System and Service Manager LINK : 
+					- https://www.freedesktop.org/wiki/Software/systemd/
+				- NGINX Init Scripts LINK :
+					- https://www.nginx.com/resources/wiki/start/topics/examples/initscripts/
+				- NGINX systemd service file
+					- https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
+					- copy the copfig form the file and copy that in "/lib/systemd/system/nginx.service" path
+					- maybe reboot the machine and start the service
+					- systemctl start nginx
+					- systemctl enable nginx
+					
+		-- Configuration terms : 
+			- To get current nginx build argument:
+				- nginx -V
+			- to test if configuration is correct or not ;
+				- nginx -t
+			- HTTP response status code url:
+				- https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+			- vvariable: https://nginx.org/en/docs/varindex.html
+				- example : set $<veriableName> <veriableValue> ;
+			- buffers and timeout :
+				URL : https://nginx.org/en/docs/syntax.html
+				
+		-- WE can upgrade the NGINX or add or remove module 
+			- first we will check the exsisting configuration command by : 
+				- nginx -V : this CMD will give us the exsisting configuration list
+			- then we can check the module list (cd into source folder) :
+				- ./configure ./configure --help | grep -i <the module you want to search>
+			- then we will add thet module in the existing configuraion CMD and will also add the module config path like below 
+				- ./configure <exesing config module> --with-http_image_filter_module --modules-path=/etc/nginx/modules
+					- in above CMD --with-http_image_filter_module is the new module added
+					- --modules-path=/etc/nginx/modules module path added 
+				- once this is done hit enter , It will also ask for dependend packages,install the dependent packages 
+				- once all dependancy installed the hit :
+					- make
+					- make install
+				- this will not change existing configuration . only add the new module
+				- after successfull installation we need to add  the module in /etc/nginx/nginx.conf file 
+					- load_module modules/ngx_http_xslt_filter_module.so ;
+		- compressed response with zip :
+			- Module ngx_http_gzip_module
+				- https://nginx.org/en/docs/http/ngx_http_gzip_module.html
+		
+		- performance testing with apache Bench (HTTP server benchmarking tool) :
+			- install : 
+				- apt-get install apache2-utils  => ubuntu/DEB
+				- yum install httpd-tools
+		
+		- fastCGI Cache :
+			- link of Module ngx_http_fastcgi_module :
+				- https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html
+				
+		- http2 : http1 is textual data and https2 is binay data.
+			- how to configure :	
+				- check the exisiting config :
+					- nginx -V ==> copy the config
+				- then go to nginx binay folder and find --with-http_v2_module like :
+					- ./configure --help | grep -i http_v2
+				- Then add that module in existing config :
+					- ./configure <existing config> --with-http_v2_module
+					- make
+					- make install
+					
+		- how to listen on http and send response on https:
+			- add new server block like below and restart nginx	
+				- server {
+							listen        80;
+							server_name  <server_name/IP>;
+							return 301 https://$host$request_uri
+						}
+	    - improve your nginx SSL configuration link:
+			- https://scaron.info/blog/improve-your-nginx-ssl-configuration.html
+			
+		- application or server load testing tool :
+			- siege : https://blog.eldernode.com/install-siege-on-centos/
+				- yum install siege		(centos/RHEL)
+				- apt install siege	 	(ubuntu/DEB)
+		- rate limitng in nginx :
+			- https://www.freecodecamp.org/news/nginx-rate-limiting-in-a-nutshell-128fe9e0126c
+			- https://www.nginx.com/blog/rate-limiting-nginx/
+		- basic Auth : is to add username and password layer above any admin login page
+			- link 
+				- https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+			- Frist we need to generate simple password file:
+				- .htpasswd  (this should be hidden file)
+			- install pre-requisit :
+				- yum install httpd-tools	(centos/RHEL)
+				- apt install apache2-utils	(ubuntu/DEB)
+			- command to create user and password :
+				- htpasswd -c <PathToFile>/.htpasswd <username>
+				- example:
+					htpasswd -c /etc/nginx/.htpasswd user1
+			- now add below lines in server block;
+				-  auth_basic "Secure Area";
+				   auth_basic_user_file /etc/nginx/.htpasswd;
+				- also you can enable and disable auth in individial block of location:
+					- auth_basic off/on; 
+		- Hardening nginx :
+			- keep everything upto date : 
+				- yum update -y 
+			- Check nginx version: 
+				- nginx -v
+			- Hide nginx version in responce add below lines in http block of nginx.conf file
+				- server_tokens off;
+				- Then reload server
+				
+			- add below header in server block to resist cross-origin framing :
+				- add_header X-Frame-Options "SAMEORIGIN";
+				- add_header X-XSS-Protection "1; mode=block";
+			- remove unnesesory and dengerus module : 
+				- we can get the module which we can remove bte CMD : 
+					- ./configure --help | grep -i without
+				- like if we want to unmount autoindex_module	we can build nginx with below module CMD: 
+					- --without-http_autoindex_module
+					- we can get the current installation cmd by :
+						- nginx -V
+					- Then copy the existing config with the one which we wanted to remove :  LIKE;
+						- ./configure --without-http_autoindex_module <existing config>
+						- make 
+						- make install
+						
+			- automatic generate and renew ssl/TLS certificate:
+				- https://letsencrypt.org/
+				- https://certbot.eff.org/
+				- https://letsencrypt.org/2015/11/09/why-90-days.html
+				- https://eff-certbot.readthedocs.io/en/latest/
+				
+	- Reverse Proxy : 	links :
+		- https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+		- https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+		- events{}
+		  http{
+		  server{
+				listen 8080;
+				proxy_set_header Host $host;
+				proxy_set_header X-Real-IP $remote_addr;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+				location / {
+					proxy_pass 'http://<ip/domain>/'
+					}
+			}
+		  }
+		  - Custom log format for proxy server:
+			- log_format custom_log '"Request: $request\n Status: $status\n Request_URI: $request_uri\n Host: $host\n Client_IP: $remote_addr\n Proxy_IP(s): $proxy_add_x_forwarded_for\n Proxy_Hostname: $proxy_host\n Real_IP: $http_x_real_ip\n User_Client: $http_user_agent"';
+
+					server {
+					
+						listen       80;
+						server_name  www.example.com;
+						
+							access_log /var/log/nginx/custom-access-logs.log custom_log;
+						
+							proxy_set_header Host $host;
+							proxy_set_header X-Real-IP $remote_addr;
+							proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+							add_header Test_header jay;
+						
+					
+						location / {
+							proxy_pass http://127.0.0.1:9001;
+					
+						}
+					
+					}
+		  
+		- test curl with while loop :
+			-  while sleep 0.5; do curl -Ivk https://192.168.1.25:443 ; done
+		
+	- load ballancer ; links
+		- https://nginx.org/en/docs/http/load_balancing.html
+		- https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/
+		- https://nginx.org/en/docs/http/ngx_http_upstream_module.html
+		- http {
+			upstream backend {
+				# Least Connections – A request is sent to the server with the least number of active connections, again with server weights taken into consideration:
+				least_conn; 
+				
+				# IP Hash – The server to which a request is sent is determined from the client IP address. In this case, either the first three octets of the IPv4 address or the whole IPv6 address are used to calculate the hash value. The method guarantees that requests from the same address get to the same server unless it is not available
+				ip_hash;
+				
+				server backend1.example.com;
+				server backend2.example.com;
+				server 192.0.0.1 backup;
+			}
+			
+			server {
+				location / {
+					proxy_pass http://backend;
+				}
+			}
+		  }
+		- sticky session or ip_hashing or least_conn 
+		- 
+
+				
+					
+				
+				
+		
+			
+				
+			
+	
+	
+#######################################################
+########## SSL / TLS Certification ####################
+#######################################################
+
+SSL : secure socket layer (RFC) 1994
+TLS : Transport layer Security 1999 : TLS based on SSL / or upgraded SSL (RFC2246)
+
+
+-- Why do we need SSL certificates ?
+
+	1.	Source identity Verification
+	2.	Security against Man-in-the-middle (MITM)
+	3.	Client/Server authentication
+	4.	Non-Repudiation
+
+-- How SSL WORK ?
+	1. CA(certificate Authority(ex. Godaddy,symanter)) publishes its root certificate (Public certificate) To all browser vendors (ex, Google chrome,Mozila)
+	2  CA's Root certificate(public certificate) then distributed as part of the browser application.
+	3.	Me who want SSL can geneterate my ssl certificate and send that to CA for authentication by creating signing request to CA once CA sign the request . it will shared signed public and private certificate. which can be used as SSL/TLS cert.
+	4. client request for the website or SSL/TLS handshaking.
+	5. Client server will share SSL certificate for the website to the client.
+	6. client will verify that SSL certificate by doing lookup with the appropriate CA Root certificate (public key).
+	
+-- Encryption algorithms:
+	- Obsolate
+		- DES (Symmetric)
+		- 3DES (Symmetric)
+	- Modern
+		- AES (Symmetric)
+		- RSA (Asymmetric)
+		
+	
+-- Hash ==> Hash verifies the integrity of data.
+	1. like on data you apply hash function and create hash value then you send data+hash value to reciver.
+	2. on reciver side data+hash recived and data is removed from hash+data. Then hash funtion apply on data and create the hash value. that hash value then compaired with the hash value shared by sender and caompaired for data integrity.
+	3. if both hash value matched then we can assume that data is protected and not hamperd in transit.
+	
+-- Hashing algorithms:
+	- MD5 (128 bit) : used for password integrity in transit
+		-	md5sum file.txt
+	- SHA
+		- SHA-1 (160 bit)
+			-	sha1sum file.txt
+		- SHA-256 (256 bit)
+			-	sha256sum file.txt
+		- SHA-512 (515 bit)
+			-	sha512sum file.txt	
+	- HMAC (can be used MD5 and SHA)
+
+-- Asymmetric Keys 
+	- private keys : kept private at owner side 
+	- public keys  : can be shared with anyone
+-- How we can use it ?
+	1. for encreption of data 
+		- Sender can encrypt data in with public key and owner can decypt the data with provate key 
+	2. For signing and verifying signature.
+		- Owner can create a hash from the data and then encrypt that hash with private key and then can send data+encrypted-hash to reciver,
+		- Reciver will recive the data+encrypted-hash and seperate data and encpypted-hash, Then Encypt the data with hash function and decrpted the encpypted-hash wtih public key from the owner and verify and authenticate the data.
+	
+	
+-- RSA (Asymmetric) : Public-key Cryptosystem
+	- Key length or RSA key both public and private is B/W :
+		- 1024
+		- 2048 - mainly used
+		- 2072
+		- 4096
+
+-- PKI (Public Key Infrastructure)
+
+
+-- What information an Certificate holds.
+	- Information about owner
+	- information about issuer
+	- Signature		==> Signature is Encrypted with private key of CA with hash of certificate
+	- public key  ==> public key in certificate ALWAYS belongs to owner of certificate
+
+
+-- openssl CMD	
+	- To generate RSA key:
+		- openssl genrsa -out private.key 2048 // with no encryption
+		
+	- To Verifying a private key file.
+		- openssl rsa -in private.key -check
+		
+	- To generate RSA private key and CSR certificate
+		- openssl req -nodes -newkey rsa:2048 -keyout custom.key -out custom.csr
+		
+	- To Verifying a CSR file
+		- openssl req -noout -text -in custom.csr
+
+	- Create new Private Key and Self Signed certificate.
+		- openssl req -x509 -sha512 -nodes -days 730 -newkey rsa:2048 -keyout custom.key -out custom.crt
+		
+	- To Verifying the Certificate Signer Authority
+		- openssl x509 -in custom.pem -noout -issuer -issuer_hash
+	
+	- To Checking Hash value of a certificate
+		- openssl x509 -noout -hash -in custom.pem
+	
+	- Converting PEM to DER format
+		- openssl x509 -outform der -in customprivate.pem  -out customprivate.der
+		
+	- Checking pem file certificate expiry date
+		- openssl x509 -noout -in custom.pem -dates
+		
+	- Create dhparam for ssl :
+		- openssl dhparam -out dhparam.pem 2048
+	
+	
+
+
+

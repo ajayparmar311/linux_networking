@@ -1,5 +1,44 @@
+https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances:
+
+
+vagrant comamnd :
+	1 :  if you have vagrant file then u can just start the vm 
+		- vagrant up
+	2 :	 one the machine started u can ssh to it .
+		-  vagrent ssh <mahcine name>
+	3 : login with ssh client directly. you will need private key of the machine . and if u have created VM from vagrant then you will get the private key under (.vagrant/machines/<machine_name>/virtualbox/private_key) path 
+		- ssh -i <private key path> <sarver_user>@<server_ip>
+		
+kops create cluster --name=kubevpro.ajayparmar.xyz \
+> --state=s3://vprofile-kops-state311 --zones=us-east-2a,us-east-2b \
+> --node-count=2 --node-size=t3.small --master-size=t3.medium \
+> --dns-zone=kubevpro.ajayparmar.xyz --node-volume-size=8 --master-volume-size=8
+
+kops update cluster --name kubevpro.ajayparmar.xyz --state=s3://vprofile-kops-state311 --yes --admin
+
+
+
+
+The server is accessible via web console at:
+    https://192.168.99.102:8443/console
+
+You are logged in as:
+    User:     developer
+    Password: <any value>
+
+To login as administrator:
+    oc login -u system:admin
+
+
+-- Exporting of OpenShift images is occuring in background process with pid 3204.
+
+
+
 git repo.
 git config --global core.autocrlf false # if it shows any working like : (warning: in the working copy of 'README.md', LF will be replaced by CRLF the next ti)
+
+git config user.name "ajay"
+git config user.email "ajayp.parmar311@gmail.com"
 
 echo "# networkclass" >> README.md
 git init
@@ -8,6 +47,39 @@ git commit -m "first commit"
 git branch -M main
 git remote add origin https://github.com/ajayparmar311/networkclass.git
 git push -u origin main
+ 
+externel repository : 
+	- github
+	- gitlab
+	- bitbucket
+	
+git remote add origin <connection string> 	#  TO add remote repository
+git remote -v 								#  To List all repository
+git push -u origin master 					#  To push file to remote repo
+
+
+git restore <filename> 		# To discaard changes in working dir
+git log 		# to see logs
+git log -n 1	# to check mentioned number of log
+git log --name-only 	# to check file name 
+git log --oneline		# show details in one line
+git log --graph --decorate	
+
+
+git branch <branch name> 		# to create a branch
+git checkout <branch name>		# to switch to a branch 
+git checkout -b <branch name> 	# to create branch and swich to that branch 
+git branch 						# to checek all listed branch local only
+gir branch -a 					# to list all branch local and remote 
+git branch -d <branch name> 	# To delete a branch 
+
+git merge <branch_name>
+
+step togather
+	- git fetch origin master			# to fetch changes in local repo
+	- git merge origin/master			# to fetch changes in local repo
+we can perform above task in one command : 
+	- git pull origin master
 
 ################ user management #######################
 
@@ -16,7 +88,11 @@ chage -l <username>
 /etc/login.defs  ---- default setting for users
 /etc/pam.d/system-auth  --------need to check
 
+file read permission : 
 
+4 = r (read)
+2 = w (write)
+1 = x (execute)
 
 
 
@@ -60,7 +136,18 @@ example : snap info curl
 
 
 
+ls -l /etc/yum*
+yum list <package-name> --> to get if package is installed or not
+yum remove <package-name> --> to remove installed package
+yum --showduplicates list <pkge-name> - to get all available version
+yum repolist   --> t get repo list
+rpm -i telnet.rpm  --> use to install package
+rpm -e telnet.rpm  --> use to uninstall package
+rpm -q telnet.rpm  --> use to query package
 
+mkdir -p /test/check/main/india   // thi command will  create all dir if not exist
+yum group list   /// compilation tool
+yum groupinstall ''
 curl -I http://192.168.1.25/index.html
 man | man -k 
 apropos <string or command> : apropos - search the manual page names and descriptions
@@ -70,7 +157,8 @@ ncal
 date
 help
 pwd
-last
+lasts
+curl ifconfig.media  ==> To get public ip
 netstat -rvn // show gateway details
 netstat -tunlp // show all the open port
 ss -napt // utility to investigate socket
@@ -537,7 +625,7 @@ By default SSH port runs on 22. Most hackers looks for any open SSH server with 
 	- CMD to generate keys : 
 		-- ssh-keygen
 	- CMD to copy keys to server  
-		-- sh-copy-id <user>@<serverip>
+		-- ssh-copy-id <user>@<serverip>
 	- cmd to login from client to server
 		-- ssh <server-user>@<server-ip>
 		-- ssh -i <server-user> <server-ip>
@@ -1066,6 +1154,28 @@ statically from the source with nginx by using --with-pcre=<path> option.
 					}
 			}
 		  }
+		  - Custom log format for proxy server:
+			- log_format custom_log '"Request: $request\n Status: $status\n Request_URI: $request_uri\n Host: $host\n Client_IP: $remote_addr\n Proxy_IP(s): $proxy_add_x_forwarded_for\n Proxy_Hostname: $proxy_host\n Real_IP: $http_x_real_ip\n User_Client: $http_user_agent"';
+
+					server {
+					
+						listen       80;
+						server_name  www.example.com;
+						
+							access_log /var/log/nginx/custom-access-logs.log custom_log;
+						
+							proxy_set_header Host $host;
+							proxy_set_header X-Real-IP $remote_addr;
+							proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+							add_header Test_header jay;
+						
+					
+						location / {
+							proxy_pass http://127.0.0.1:9001;
+					
+						}
+					
+					}
 		  
 		- test curl with while loop :
 			-  while sleep 0.5; do curl -Ivk https://192.168.1.25:443 ; done

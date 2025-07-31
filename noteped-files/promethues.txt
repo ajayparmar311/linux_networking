@@ -1,0 +1,381 @@
+ssh -i private_key -L 9090:127.0.0.1:30090 -L 3000:127.0.0.1:3000 vagrant@192.168.56.14
+kubectl api-resources | grep prometheus			// to get all the kubernetes api
+
+SLACK WEBHOOK :https://hooks.slack.com/services/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
+
+use yamllint to validate yaml file : 
+	- apt install yamllint -y
+
+- prometheus alternatives:
+	- graphite
+	  influxdb
+	  opentsdb
+	  nagios
+	  sensu
+	  
+- prometheus collects the metrics ---> send alters to alert manager if trigger any -----> send notification to comm chaneela like slack , pagerduty, email etc
+
+
+- prometheus server component : 
+	- retrieval 
+	  TSDB/storage	--------- > HDD/SDD
+	  HTTP server
+	  
+	 - prometheus pull metrics from target system. (jobs/ Exporters),
+	 - there is pushgateway used in between of shortlived jobs , which push metrics to pushgateways and then prometheus pull the metrics from pushgateway
+	 - Service discovery : service discovery in Prometheus is the mechanism used to automatically detect and monitor targets (such as applications, servers, or containers) without manual configuration. Instead of statically defining all monitoring targets, service discovery dynamically identifies and updates the list of targets based on changes in the environment.
+	 
+	 - prometheus data visualization and export : 
+		- prometheus web ui 
+		  grafana
+		  api client
+		  
+	 - Alertmanager (prometheus alerting) :  prometheus will puch alert if any alert trigers
+	 
+
+- Access prometheus from local machine 
+	- by kubectl proxy : http://localhost:8001/api/v1/namespaces/default/services/promalertm-prometheus-server:80/proxy
+	- by port forwording : 
+		- kubectl port-forward svc/promalertm-prometheus-server 30090:80
+	  also open port at NAT :
+	  then ssl to VM with port forwording : 
+	  -  ssh -i private_key -L 9090:127.0.0.1:30090 vagrant@192.168.56.14
+	  - ssh -L 9090:localhost:30090 -L 3000:localhost:3000 -L 8080:localhost:8080 vagrant@<vm-ip>
+	  
+	- we will set systemd service for "port-forwording" and "node-exporter"
+			- sudo systemctl daemon-reload
+			- sudo systemctl enable kubectl-port-forward.service
+			- sudo systemctl start kubectl-port-forward.service
+			- create : sudo nano /etc/systemd/system/kubectl-port-forward.service
+				[Unit]
+				Description=Kubectl Port Forwarding Service
+				After=network.target
+				
+				[Service]
+				ExecStart=ExecStart=/bin/bash -c "/usr/local/bin/kubectl port-forward svc/prometheus-stack-kube-prom-alertmanager -n monit 9093:9093 ; /usr/local/bin/kubectl port-forward svc/prometheus-stack-kube-prom-prometheus 9090:9090 -n monit ;  /usr/local/bin/kubectl port-forward svc/prometheus-stack-grafana -n monit 3000:80"
+				Restart=always
+				User=root
+				Environment=KUBECONFIG=/home/vagrant/.kube/config
+				
+				[Install]
+				WantedBy=multi-user.target
+				
+			- create sudo nano /etc/systemd/system/node-exporter.service
+				sudo systemctl start node-exporter.service
+			
+				[Unit]
+				Description=Node Exporter
+				After=network.target
+				
+				[Service]
+				User=root
+				Group=root
+				Type=simple
+				ExecStart=/home/vagrant/helm/exporter/node_exporter-1.8.2.linux-amd64/node_exporter --web.listen-address=:9100
+				
+				[Install]
+				WantedBy=multi-user.target
+	
+- formate of prometheus data : 
+	example : 
+		- # TYPE net_conntrack_listener_conn_accepted_total counter
+		
+			net_conntrack_listener_conn_accepted_total{listener_name="http"} 2030
+			<metrics_name>{key1="value1", key2="value2"} <sample data/ either boolen or numeric>
+			
+				- net_conntrack_listener_conn_accepted_total : this is metrics name
+				- listener_name="http" : This is label
+				- 2030 : sample data for a metrix
+				
+		- every application should have instrumentation in its code to expose metrics to some endpoint like /metrics in above formate only prometheus
+	
+- Exporters:
+	- In Prometheus, exporters are components that collect and expose metrics from external systems, services, or hardware in a format that Prometheus can scrape and monitor.
+	- Prometheus primarily pulls metrics from HTTP endpoints in a specific format. However, not all systems natively expose metrics in this format. Exporters act as bridges between Prometheus and these systems by:
+		- Collecting metrics from external services.
+		- Converting data into Prometheus' required format.
+		- Exposing the metrics over an HTTP endpoint for Prometheus to scrape.
+		
+	- Types of Exporters
+		Official Exporters (maintained by Prometheus developers):
+			- Node Exporter: Collects hardware and OS metrics (CPU, memory, disk, network).
+			- Blackbox Exporter: Tests endpoints for availability and performance (HTTP, TCP, DNS).
+			- Pushgateway: Pushes metrics for short-lived jobs that cannot be scraped.
+		Third-Party Exporters (maintained by the community):
+			- MySQL Exporter: Monitors MySQL server metrics.
+			- Redis Exporter: Tracks Redis server performance.
+			- Kafka Exporter: Exposes Kafka broker metrics.
+			- JMX Exporter: Monitors Java applications via JMX (Java Management Extensions).
+			
+	- Node exporter : 
+		1 . install node exporter on your vm.
+		2 . edit prometheus.yml file of prometheus.
+			for this step if we are using helm we need to update values.yaml files because in helm we can not update prokmetheus.yml file directlly . this file is created from values.yaml file only .
+		3 . So now we will get the extract values.yaml file from existing installation 
+			- helm get values <helm-service-name> --all > values.yaml
+		4 . now we will edit the values.yaml file for that we will search "serverFiles" in values.yaml and under that we will find  "prometheus.yml:" there we will update over "scrape_configs:"
+			
+			scrape_configs:
+			- job_name: node-exporter-vm
+			static_configs:
+			- targets:
+				- 192.168.56.14:9100
+				
+- promQL :
+	- data type in promql: 
+		- Scalar : A scalar is a single numeric value (a floating-point number) that represents a specific point in time. It is used mainly for mathematical calculations in PromQL.
+		example : node_memory_MemFree_bytes > 500000000
+
+		- instant vactor : An instant vector represents a set of time-series data at a single point in time.
+			example : node_cpu_seconds_total
+		- Range vactor : A range vector represents a set of time-series data over a specified time range.
+			- node_cpu_seconds_total[5m]
+		
+		- String : A string is a single line of text. Currently, PromQL does not support direct string manipulation but strings are used mainly for labels and metadata.
+		
+		- boolean : A boolean represents true or false values, often used for comparisons.
+			- up == 0
+			- Result: true (1) or false (0) depending on whether the target is down or up.
+			
+	- selector and matcher:
+		- equal(=) :  this will match the label
+			- node_filesystem_avail_bytes{fstype="ext4"}
+		- not equal to(!=) : node_filesystem_avail_bytes{fstype!="ext4"}
+		- reguler expration match (=~) : node_filesystem_avail_bytes{mountpoint=~"/run.*"}
+		- not equal to reguler expration match (!~) : node_filesystem_avail_bytes{mountpoint!~"/run.*"}
+		- range vector selector :node_filesystem_avail_bytes{mountpoint!~"/run.*",fstype="ext4"}[5m]
+			- [5m] : is the data in between the 5 min time frame
+		- offset : 
+			-  node_filesystem_avail_bytes{mountpoint!~"/run.*",fstype="ext4"} offset 5m
+				- this will ge the data 5 min before of the time
+			-  node_filesystem_avail_bytes{mountpoint!~"/run.*",fstype="ext4"} @<timestampvalue>
+				- this will give us the specific timeframe value
+				
+	- Binary operators:
+		- arthemetic operation : node_memory_MemTotal_bytes/1024/1024	
+		- compairition operator : node_cpu_seconds_total>500
+		- logical operator : 
+			- union : prometheus_http_requests_total or promhttp_metric_handler_requests_total
+			  intersection : prometheus_http_requests_total and promhttp_metric_handler_requests_total
+			  
+	- 'ignoring' and 'on' keyword: 
+		-  prometheus_http_requests_total and ignoring(handler) promhttp_metric_handler_requests_total
+			- and ignoring(handler) : will ignore the handler label
+		
+		-  prometheus_http_requests_total and on(code) promhttp_metric_handler_requests_total
+			- and on(code) : will use only code to do intersection or union
+			
+	- aggregation Operators: In PromQL, aggregation operators are used to groupls 
+	and summarize data across one or more dimensions (labels). These operators help in reducing the dataset by applying functions like sum, avg, max, min, etc., over specified label dimensions.
+	
+		Operator	--- Description
+		sum			--- Computes the sum of values across all series in the specified group.
+			- sum(prometheus_http_requests_total) by (code)
+			- where by (code) will do group by con code label
+			- we can also use without(code)
+		avg			--- Computes the average of values across the series in the specified group.
+		min			--- Finds the minimum value across the series in the group.
+			- min(node_cpu_seconds_total)
+		max			--- Finds the maximum value across the series in the group.
+			- max(node_cpu_seconds_total)
+		count		--- Counts the number of series in the group.
+		count_values--- Counts series grouped by unique values of a specified label.
+		stddev		--- Computes the standard deviation of values across series in the group.
+		stdvar		--- Computes the variance of values across series in the group.
+		topk		--- Selects the top K series based on their values.
+			- topk(3,sum(node_cpu_seconds_total) by (mode))
+			- topk(<no-of-values> ,  values)
+		bottomk		--- Selects the bottom K series based on their values.
+			- bottomk(3,sum(node_cpu_seconds_total) by (mode))
+			- bottomk(<no-of-values> ,  values)
+		quantile	--- Computes a specific quantile (e.g., 50th percentile) across series in the group.
+		
+	- Funtion : 'rate' and 'irate' ,
+		In PromQL (Prometheus Query Language), the rate() and irate() functions are used to calculate the rate of change for counter metrics. These functions are essential for analyzing time-series data that continuously increases, such as request counts or network traffic.
+		
+		- rate() funtion : The rate() function calculates the average per-second rate of increase of a counter over a specified time window.
+			- rate(prometheus_http_requests_total[2m])
+	- gauges : In PromQL (Prometheus Query Language), gauges are a type of metric that represents a single numerical value that can arbitrarily go up or down over time.
+		- Key Characteristics of Gauges:
+			- Can increase or decrease at any point in time.
+			- Represents a value at a specific moment rather than cumulative totals.
+			- Examples include temperature, memory usage, CPU usage, or disk space usage
+	- In PromQL, the functions changes(), deriv(), and predict_linear() are used for time series analysis
+			
+		- change() :  The changes() function counts the number of times a value changes over a given time window.
+			- changes(process_start_time_seconds[1h])
+			- changes(node_cpu_seconds_total{mode="system"}[5m])
+			
+		- deriv : The deriv() function calculates the rate of change (slope) between data points in a given time range, assuming a linear trend.
+			- deriv(node_cpu_seconds_total{mode="user"}[5m])
+			
+		- predict_linear: The predict_linear() function predicts the value of a metric at a future time based on the current trend.
+
+
+	- range vector aggregations (max_over_time, min_over_time, avg_over_time, and count_over_time and so on .....): 
+		In PromQL, the functions max_over_time, min_over_time, avg_over_time, and count_over_time are range vector aggregations used to compute statistics over a specified time range. These functions operate on range vectors and return instant vectors based on the specified time window.
+		
+		Example: 
+			- max_over_time(node_cpu_seconds_total{mode="user"}[5m])
+			- min_over_time(node_memory_MemFree_bytes[1h])
+			- avg_over_time(node_load1[10m])
+			- count_over_time(http_requests_total[1h])
+	
+	- sort funtion : to sort linear vactor output,
+		- sort(node_cpu_seconds_total)
+		- sort_desc(node_cpu_seconds_total)
+		
+	- time and date function : 
+		- time(): provide the current time value
+			- time() - process_start_time_seconds
+			
+- recording rules :  
+	- reload config endpoint :  curl -X POST http://localhost:9090/-/reload
+	- we can add recordingrule by kube CRD's : like podmonitor , servicemonitor, prometheusrules
+	- we can see the existing rules by : 
+		- kubectl get prometheusrules -n monitoring
+		
+		- we can create customerules by crearing crds for rules like given below .
+		- this yaml menifest will create a recording rule in pormetheus and load that rule automatically without restarting prometheus
+		
+		-  to add prometheus custom resource , kubernetes shoud have Prometheus operator and CRDs , How you can check that ,
+			- kubectl get prometheus -n <namespace>
+			- kubectl get crd
+			
+		- we can also load pormetheus config by prometheus reload endpoint:
+			- you need to enable prometheus lifecycle 
+				-  ./prometheus --web.enable-lifecycle
+			- Now you can run this : 
+				- curl -X POST http://localhost:9090/-/reload
+		
+		- we can use SIHUP signal to reload the prometheus config if prometheus is install on direct machine 
+			- get the processid (PID) of prometheus :
+				- ps -ax | grep prometheus 
+			- run the kll command as below : 
+				- klll -HUP <PID>
+				
+		- we can use promtool to validate the rules.yaml file
+			- ./promtool check rules <rules-file-path>
+
+			
+		- please make sure to add label used in pormetheus crd operator to select the rules or scape the rules for prometheus.
+		
+		- how you can get the lables , describe the prometheus operator .
+			- kubectl get prometheus -n monitoring
+			- kubectl describe prometheus prometheus-stack-kube-prom-prometheus -n monitoring
+				- under that we need to match the labels:
+					Pod Monitor Selector:
+						Match Labels:
+						  Release:  prometheus-stack
+					Probe Selector:
+						Match Labels:
+						  Release:   prometheus-stack
+					Rule Selector:
+						Match Labels:
+						  Release:  prometheus-stack
+					Scrape Config Selector:
+						Match Labels:
+						  Release: 	prometheus-stack
+					Service Monitor Selector:
+						Match Labels:
+						  Release:  prometheus-stack			
+
+				- we can use above labele in over (PrometheusRule, podmonitor, servicemonitor) menifest to get recognized by prometheus
+			
+			apiVersion: monitoring.coreos.com/v1
+			kind: PrometheusRule
+			metadata:
+			name: example-recording-rules
+			namespace: monitoring
+			labels:
+				app: kube-prometheus-stack
+				app.kubernetes.io/instance: prometheus-stack
+				app.kubernetes.io/managed-by: Helm
+				app.kubernetes.io/part-of: kube-prometheus-stack
+				app.kubernetes.io/version: 67.5.0
+				chart: kube-prometheus-stack-67.5.0
+				heritage: Helm
+				release: prometheus-stack			// same used hr 
+			spec:
+			groups:
+			- name: example.rules
+				interval: 30s  # Optional: Sets the evaluation interval (default is 30s).
+				rules:
+				- record: instance:cpu_usage:rate5m  # Name of the new time series. <level:metric:operations> -- industry standered
+				expr: rate(node_cpu_seconds_total{mode="user"}[5m])  # Expression to compute the metric.
+				labels:
+					severity: low  # Optional: Attach additional labels to the recorded time series.
+				- record: instance:memory_utilization:ratio
+				expr: 1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+				- alert: HighCPUUsage
+				  expr: sum(rate(container_cpu_usage_seconds_total[5m])) by (instance) > 0.8
+				  for: 5m				// to get the alerts reload after 5 min OR above alerting rule must be true for 5 min
+										// this keep evaluating the alerts for 5 min , if not resolved then fires it.
+				  labels:
+				  	severity: warning
+				  annotations:
+				  	summary: High CPU usage on {{ $labels.instance }}
+				  	description: |
+				  	CPU usage is above 80% for the last 5 minutes on {{ $labels.instance }}.
+				  	Current value is {{ $value }}.
+				- alert: MemoryUsage
+				  expr: sum(container_memory_working_set_bytes) by (instance) > 1e+09
+				  for: 10m
+				  labels:
+				  	severity: critical
+				  annotations:
+				  	summary: High Memory Usage on {{ $labels.instance }}
+				  	description: |
+				  	Memory usage is above 1 GB for the last 10 minutes on {{ $labels.instance }}.
+				  	Current value is {{ $value }}.
+					
+		- we can type ALERTS in the promQL search box to get all the firing alerts
+	
+	- Alertmanager :  
+		- Here’s an example Kubernetes manifest for an AlertmanagerConfig resource where kind: AlertmanagerConfig. This CRD is often used when you have Prometheus Operator deployed, and you want to manage Alertmanager configurations for specific namespaces or routes.
+		- alertmanager default port : 9093/TCP,8080/TCP
+		- alert-manager app password : psgmfkcqjfpmamnj
+			
+			kubectl create secret generic smtp-secret \
+			--from-literal=password='psgmfkcqjfpmamnj' \
+			-n monitoring
+			
+		- to add the gmail email notificaction , We need to update alermanager.yaml file . for that we will first get the alert manager config file from kubectl secrets.
+			-  kubectl get secret <ALERTMANAGER-SECRET-NAME> -n monitoring -o jsonpath='{.data.alertmanager\.yaml}' | base64 -d > alertmanager.yaml
+			- kubectl get secret alertmanager-prometheus-stack-kube-prom-alertmanager -n monit -o jsonpath="{.data.alertmanager\.yaml}" | base64 --decode > alermanager-config-test.yaml
+		- Modify the alertmanager.yaml configuration to include Gmail’s SMTP settings.
+			- vim alertmanager.yaml
+				- 
+		- now delete the existing secrets and create the new one with updated values.
+			-  kubectl delete secret alertmanager-prometheus-stack-kube-prom-alertmanager -n monitoring
+			- kubectl create secret generic alertmanager-prometheus-stack-kube-prom-alertmanager -n monitoring --from-file=alertmanager.yaml
+			
+		- smtp test : 
+		swaks --to ajayp.parmar311@gmail.com --from ajju.parmar311@gmail.com --server smtp.example.com --auth LOGIN --auth-user ajju.parmar311@gmail.com --auth-password psgmfkcqjfpmamnj
+
+docker run --name mongodb   -d   -p 27017:27017   -v mongodb_data:/data/db   -e MONGO_INITDB_ROOT_USERNAME=admin   -e MONGO_INITDB_ROOT_PASSWORD=secret   mongo
+
+
+
+docker run -d \
+  --name mysql-server \
+  -e MYSQL_ROOT_PASSWORD=my-secret-pw \
+  -e MYSQL_DATABASE=mydb \
+  -p 3306:3306 \
+  -v mysql_data:/var/lib/mysql \
+  mysql:8.0
+
+
+
+open telemerty: arch: 
+  - microservice->oTelSDK( OR auto instrumentation)    --> Otel exportter or plugins (OTEL exporter,prometheus exporter,newrelic exporter) --> otel collector(optional,for multiple microservice and sophisticated system) --> prometheus
+  
+  
+zero code openteletry : otel adds API or SDK capabilities thriugh agent or agent like installation
+
+- instrumentation methods : 
+	- bytecode manipulation : modifying bytecode of a program at runtime
+	- Monkey Patcing: Modifyting existing code at runtime
+	- eBPF: Technology for instrumentation , tracing and monitoring in the linux kernel
+	
+- docker compose up --build --force-recreate --remove-orphans --detach
