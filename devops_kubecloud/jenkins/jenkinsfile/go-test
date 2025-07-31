@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    tools {
+        go 'go-1.17'
+    }
+
+    environment {
+        GO111MODULE='ON'
+    }
+
+stages {
+    stage('check version') {
+      steps {
+        // Output will be something like "go version go1.19 darwin/arm64"
+        sh 'go version'
+      }
+    }
+    stage('Test') {
+        steps {
+            git 'https://github.com/ajayparmar311/go-webapp-sample.git'
+            sh 'go test ./...'
+        }
+    }
+  }
+
+}

@@ -49,7 +49,7 @@ orchestration technologies :
 	-  kubernetes
 	-  MESOS by apache
 	
-
+	
 OCR : openshift container registry
 
 how to install local minishift setup on Virtualbox 
@@ -59,6 +59,10 @@ how to install local minishift setup on Virtualbox
 	- then extract and run the command : 
 		- minishift config set docker-opt "add-registry=quay.io"
 		- 	minishift start
+	- we can delete minishift by CMD below : 
+		- minishift delete --force --clear-cache
+		
+18002081800
 
 get the token : 
 oc whoami -t
@@ -74,9 +78,7 @@ rest call for OKD :
 
 
 so in kubernetes we can deploy application as an docker-container where container are created from docker images of the application ,
-
 Images can we pulled from globel docker registry or from openshift container regisrty(OCR) which comes built in OKD
-
 
 so we can either deploy a pod or multiple pod in deployements and er can expose this pod or deployment with the help of services.
 
@@ -90,7 +92,6 @@ so if we see kubernetes or OKD has two main component :
 in OKd we can build  image with :
 	- docker file 
 	- source-To-Image(S2I)
-
 
 kube arch:
 

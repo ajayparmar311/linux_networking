@@ -1,0 +1,32 @@
+Here are the commands executed in the next steps. Please refer back to them if you have any problems.
+
+gcloud config set project glowing-furnace-304608
+gcloud pubsub topics create topic-from-gcloud
+gcloud pubsub subscriptions create subscription-gcloud-1 --topic=topic-from-gcloud
+gcloud pubsub subscriptions create subscription-gcloud-2 --topic=topic-from-gcloud
+gcloud pubsub subscriptions pull subscription-gcloud-2
+gcloud pubsub subscriptions pull subscription-gcloud-1
+gcloud pubsub topics publish topic-from-gcloud --message="My First Message"
+gcloud pubsub topics publish topic-from-gcloud --message="My Second Message"
+gcloud pubsub topics publish topic-from-gcloud --message="My Third Message"
+gcloud pubsub subscriptions pull subscription-gcloud-1 --auto-ack
+gcloud pubsub subscriptions pull subscription-gcloud-2 --auto-ack
+gcloud pubsub topics list
+gcloud pubsub topics delete topic-from-gcloud
+gcloud pubsub topics list-subscriptions my-first-topic
+
+
+create google_project_iam_member for service account token creator role
+steps to create terraform file for pub/sub topic and push subscription  for GCP  along with oidc token and im permitions
+
+Here are the commands executed in the next steps. Please refer back to them if you have any problems.
+
+
+
+gcloud compute project-info describe
+gcloud auth list
+gcloud projects get-iam-policy glowing-furnace-304608
+gcloud projects add-iam-policy-binding glowing-furnace-304608 --member=user:in28minutes@gmail.com --role=roles/storage.objectAdmin
+gcloud projects remove-iam-policy-binding glowing-furnace-304608 --member=user:in28minutes@gmail.com --role=roles/storage.objectAdmin
+gcloud iam roles describe roles/storage.objectAdmin
+gcloud iam roles copy --source=roles/storage.objectAdmin --destination=my.custom.role --dest-project=glowing-furnace-304608

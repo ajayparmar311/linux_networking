@@ -8,6 +8,10 @@ vagrant comamnd :
 		-  vagrent ssh <mahcine name>
 	3 : login with ssh client directly. you will need private key of the machine . and if u have created VM from vagrant then you will get the private key under (.vagrant/machines/<machine_name>/virtualbox/private_key) path 
 		- ssh -i <private key path> <sarver_user>@<server_ip>
+	4 : To reboot an Ubuntu VM managed by Vagrant, you can use the following commands:
+		- vagrant reload
+		- sudo reboot : if u are already sshed into machine
+
 		
 kops create cluster --name=kubevpro.ajayparmar.xyz \
 > --state=s3://vprofile-kops-state311 --zones=us-east-2a,us-east-2b \
@@ -64,6 +68,75 @@ git log -n 1	# to check mentioned number of log
 git log --name-only 	# to check file name 
 git log --oneline		# show details in one line
 git log --graph --decorate	
+
+git stash: Saves all the modified files temporarily
+git stash list: Lists all the stashed sets
+git stash apply: Applies the latest stashed content
+git stash pop: Applies the latest stashed set and drops it
+git tag: Adds a tag to a commit
+git tag -a -m: Adds an annotated tag with a message
+git push tag name: Pushes tag to the remote repo
+
+
+Syntax: git submodule add <URL of vendor library>
+Example: git submodule add https://github.com/doctrine/some-library.git
+
+git submodule add <URL>: Adds a submodule to the project.
+git submodule status: View status (working, staging, or indexed files) of all the submodules.
+git submodule update: Updates submodules after switching branches.
+git submodule update --init: After cloning a new repo, if you need to add submodules to it from .gitmodules file, use this command.
+git submodule update --init --recursive: If the submodules inside a newly cloned repo are nested, then use this.
+git submodule update --remote: Pulls all changes in the submodules.
+
+
+Introduction to Git Blame
+
+git blame helps you in such circumstances.
+Syntax: git blame <filename>
+Example: git blame index.html
+
+git blame <options> <filename>
+
+Options:
+
+-L to filter based on line numbers
+-s to suppress the author's name and timestamp from the output
+-e to show the author's email instead of the author's name
+-f to show the filename in the original commit
+-n to show the line number in the original commit
+Example: To find the author of lines 5 to 7 in the file Readme.md, one can use:
+
+git blame -L 5,7 Readme.md
+
+You can use git bisect log to find the flow of Git Bisect, that is, to see what has been done so far.
+If you find something wrong, then you can use git bisect reset.
+
+git bisect start - To start Git Bisect
+
+git bisect good - To declare that the commit is good
+
+git bisect bad - To declare that the commit has an error
+
+
+git hook : this will be availabe under .git/hook/ folder u can right script in this folder to automate some task
+
+git reflog   - this is used to check th delete file
+
+git cherrypick (Moving commits between branches)
+
+git stash (Saving changes temporarily)
+
+git submodules (Adding a subproject)
+
+git Blame (Finding the author of a line)
+
+git Bisect (Finding the commit which introduced a bug)
+
+git reflog (Retrieving deleted commits)
+
+git hooks (Automating things using script)s 
+
+
 
 git branch <branch name> 		# to create a branch
 git checkout <branch name>		# to switch to a branch 

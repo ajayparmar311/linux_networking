@@ -1,0 +1,1082 @@
+community : https://kodekloud.com/pages/community
+
+devops process :
+develop --> build --> test --> deploy
+
+CI/CD pipeline : needed for devops
+
+	- Docker : 
+		we will use container image to redues container based  	deployment.
+	- kubernetes :
+		container orchestration :
+	- terraform : 
+		we will use terraform as IaaC (infrastructure as a code) as infrastructure provisioing tool.
+	- ansible:
+		we will use ansible for post provisioing auto configuration action.like installing software and configuring them.
+	- Prometheus : 
+		use to collect server information or matric and store that centrally like cpu utilization , memory utilization etc.
+	- grafana : 
+		use to visualise the data collected from prometheus in charts and graphes.
+
+DevOps is a combination of people, processes and tools/programs.
+code-->build-->test-->release-->deploy-->operate-->monitor->feedback
+and repeate
+
+cat /etc/centos-release
+cat /etc/redhat-release
+
+
+
+Types of Testing
+	Different Types of Testing that can be automated
+	
+		- Unit Testing
+		- Integration Testing
+		- Functional Testing
+		- Smoke Testing
+		- Regression Testing
+		 		-
+services : 
+	- we can configure our own services as systemctl : 
+		- systemctl start/stop/enable my_app
+	- for that we need to configure our application as systemd unit file .
+		- file location : 
+			- /etc/systemd/system
+	- we have to create the service name file with extention as .service like :
+		- my_app.service
+		- inside that file add :
+			- [Service]
+			  ExecStart=/usr/bin/python3 /opt/code/my_app.py
+			  
+			- Then save the file 
+			- Then run : 
+				- systemctl daemon-reload
+				- systemctl start/stop my_app
+
+networking : 
+	- how to check the exsisting interface : 
+		- ip link
+	- how to add IP to and interface :
+		- ip addr add 192.168.1.10/24 dev eth0
+			- The IP range should be from switch level
+	- how to add router entry : 
+		- check the current entry by CMd : 
+			- router
+		- how to add enrty : 
+			- ip route add <destination addr> via <getway IP / router IP>
+			- Example : 
+				- ip route add 192.168.2.0/22 via 192.168.1.1
+	- To forword data in internet interfaces we need to update below file : 
+		- /proc/sys/net//ipv4/ip_forward
+		change 0 to 1 to enable the feature
+		- 0 means no-forward
+		- 1 means forward
+		
+		- also change the value in /etc/sysctl.conf file
+			- net.ipv4.ip_forward = 1
+			
+Java : 
+	export PATH=$PATH:/opt/jdk-20/bin
+	
+nodejs : 
+	- how to download and install : 
+		- wget https://nodejs.org/dist/v21.7.1/node-v21.7.1.tar.gz
+		- tar -xvf node-v21.7.1.tar.gz
+		- yum install centos-release-scl-rh
+		- yum install devtoolset-10-gcc devtoolset-10-gcc-c++
+		- scl enable devtoolset-10 bash
+		- cd node-v21.7.1
+		- ./configure
+		- make
+		- make install
+		- https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-a-centos-7-server
+		- https://forums.centos.org/viewtopic.php?t=68077#p285857
+	- package managemenet tool in nodejs : 
+		- NPM : NPM comes with nodejs installation 
+			CMD -  npm -v 							# version of NPM
+				-  npm search <name_of_package> 	# to searach any package with name 
+				-  npm install <package_name> 		# To install any package
+				-  node -e "console.log(module.paths)"	# to check all the configured path to check modules
+				- buildin modules in nodes : 
+					- ls /usr/lib/node_modules/npm/node_modules/
+					
+python : 
+	- python package comes under : 
+		- /uer/lib
+		- /usr/lib64
+	- how to install packages : 
+		- pip install <pkg_name>
+		- pip install <pkg_name> --upgrade
+		- pip uninstall <pkg_name>
+		- pip show <pkg_name>   # to check package version and details 
+	- where python interpriter look for packages:
+		-  python2 -c "import sys; print(sys.path)"
+		
+
+jenkins : 
+		jenkinsCLI : 
+			- get ssh key from pwd/.ssh/ dir 
+			- add SSH public key to user configuraton under ssh public key and save 
+			- ssh -i /home/mike/.ssh/jenkins_key -l mike -p 8022 jenkins-server help
+			- curl -Lv https://JENKINS_URL/login 2>&1 | grep -i 'x-ssh-endpoint'
+				< X-SSH-Endpoint: localhost:53801
+				
+				https://8085-port-9ea89ef098b345e0.labs.kodekloud.com/jnlpJars/jenkins-cli.jar
+				
+				sudo yum install -y yum-utils
+				sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+				
+				
+				sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+				
+				
+				docker run \
+				--name jenkins-docker \
+				--rm \
+				--detach \
+				--privileged \
+				--network jenkins \
+				--network-alias docker \
+				--env DOCKER_TLS_CERTDIR=/certs \
+				--volume jenkins-docker-certs:/certs/client \
+				--volume jenkins-data:/var/jenkins_home \
+				--publish 2376:2376 \
+				docker:dind \
+				--storage-driver overlay2
+				
+				
+				
+				docker run --name jenkins-test --restart=on-failure --detach \
+				--publish 8081:8080 --publish 50000:50000 \
+				--volume /home/ajay/jenkins/jenkins_data/jenkins_home:/var/jenkins_home \
+				jenkins/jenkins:latest
+			
+docker : CMD
+	- docker search <imagename>  # to search images
+	- docker attach foo 	# to attach to container it is same as docker exec -it <containerid>
+	- docker create --name=foo -it ubuntu:latest bash
+		- docker ps -a 
+		- docker start <container id>
+	- docker container ls -aq | xargs docker container rm		# Remove all containers
+	- docker image ls -aq | xargs docker rmi -f					# remove all images
+	- docker run -p 3001:3000 --name=server_container serve_image:v1
+	- docker run -d -p 3002:80 --name=express ajay/express:v1
+	- docker info | grep -i root 				## to search any thing
+	- docker exec -it <contianer-name> bash 	## to jump into docker container 
+	- docker cp <source-file> <container-id/name>:<path-inside container>  ## to copy fine in container
+Docker up command : 
+	- docker run --name jenkins-test --restart=on-failure --detach \
+  --publish 8081:8080 --publish 50000:50000 \
+  --volume /home/ajay/jenkins/jenkins_data/jenkins_home:/var/jenkins_home \
+  jenkins/jenkins:latest
+	- how to copy in docker
+		- docker cp <filename with path> <containername/ID>:<path inside container>
+	- how to move into docker container : 
+		- docker exec -it <containerid/ container name>
+		
+- There are 3 type of mount point : 
+ - volume mount
+ - bind mount
+ - tmpfs mount
+	- The volume mount persists data across containers by storing data in a docker-managed directory within the Docker engine. This is valuable when you need to hold on to container-created data, even if the container is removed.
+
+	- The bind mount takes a directory from the host machine and maps them to container 
+	directories. This helps when you need to constantly update a directory on the Docker host machine that contains valuable files for containers.
+
+	- The tmpfs mount is unique since data in this kind of directory only lasts during the lifetime of the running container using it. The tmpfs mount is beneficial when you need to use secret data like passwords.
+
+ 
+	- Docker volume mount : This is to mount docker engine volume path
+		- create volume : 
+			- docker volume create <volume_name>		# to create volume 
+			- docker volume ls 							# to see all created volume
+		- use the volume in container: 
+			-  docker run -d -p 3003:80 --name=bar --mount source=localvolume,target=/src/shared ajay/flask:v4
+	- docker bind mount : 
+		- this will mount any host machine path to container 
+			- docker run -d -p 3004:80 --name=foo --mount type=bind,source=/home/ajay/jenkins/docker/shared_vol,target=/src/bindmount ajay/flask:v4 
+	- Docker tmpfs mount : this path will create when we start the container and will be destroied whe we stop the container : 
+		- docker run -d -p 3003:80 --name=foo --mount type=tmpfs,destination=/tmpdir ajay/flask:v4
+				
+
+- Docker networking : 
+	- docker network --help
+
+- Docker Compose : 
+	- docker compose up --build 		# this CMD is to build images eaach time when we run
+	- docker compose up
+	- docker compose fine : docker-compose.yml
+	
+		version: "3"
+		
+		networks:
+		core:
+			driver: bridge
+		site:
+			driver: bridge
+		
+		services:
+		db:
+			build: ./db
+			networks:
+			- core
+		apparel:
+			build: ./apparel
+			volumes:
+			- ./apparel:/app
+			ports:
+			- 5001:80
+			depends_on:
+			- db
+			networks:
+			- core
+		prices:
+			build: ./prices
+			volumes:
+			- ./prices:/app
+			ports:
+			- 5002:80
+			depends_on:
+			- apparel
+			networks:
+			- core
+			- site
+		site:
+			build: ./site
+			volumes:
+			- ./site:/src
+			ports:
+			- 5000:80
+			depends_on:
+			- prices
+			networks:
+			- site
+
+	
+		Docker Compose in Depth - Volumes and Networks | Summary and Commands
+		Docker Compose in Depth | Volumes and Networks | Summary and Commands
+		
+		Excellent work on completing this section on an even deeper dive into Docker compose. In this section, we covered Docker-compose volumes.
+		
+		We used volumes creatively within the context of docker compose. Volumes are mainly reserved for creating a docker-host-managed directory for sharing files across containers. However, with volumes, we can set up automatic updating of docker-compose containers. By setting the volume to the source directory of the codebase, to the application-serving directory in the container, a live-updating setup can be achieved for docker-compose applications.
+		
+		We also explored networking in our most ambitious compose application yet - using postgresql, node+express, flask, and php to create four services. The custom networks allow us to specifically connect services to each other, to create more privileged and secure access between containers in the applications.
+		
+		Next, we’ll explore Docker swarm to explore Docker on more than one host. With more than one docker host, Docker will become even more powerful and exciting!
+		
+		In the meantime, here’s the updated summary of commands that we’ve used so far:
+		
+		Docker Containers
+		
+		Create an interactive terminal container with a name, an image, and a default command:
+		
+		Usage: docker create -it --name=<name> <image> <command>
+		
+		Example: docker create -it --name=foo ubuntu bash
+		
+		List all running containers:
+		
+		docker container ls
+		
+		(list all containers, running or not): docker container ls -a
+		
+		Start a docker container:
+		
+		Usage: docker start <container name/id>
+		
+		Example: docker start foo
+		
+		Attach to a docker container:
+		
+		Usage: docker attach <container name/id>
+		
+		Example: docker attach foo
+		
+		Remove a container:
+		
+		Usage: docker rm <container name/id>
+		
+		Example: docker rm foo
+		
+		Force remove: docker rm foo -f
+		
+		Run a new container:
+		
+		Usage: docker run <image> <command>
+		
+		Example with options: docker run --name=bar -it ubuntu bash
+		
+		Remove all containers:
+		
+		docker container ls -aq | xargs docker container rm
+		
+		Execute a command in a running container:
+		
+		Usage: docker exec <container name/id> <command>
+		
+		Example (interactive, with tty): docker exec -it express bash
+		
+		Docker Images
+		
+		Remove a docker image:
+		
+		Usage: docker image rmi <image id>
+		
+		Example (only uses first 3 characters of image id): docker rmi 70b
+		
+		Remove all images:
+		
+		docker image ls -aq | xargs docker rmi -f
+		
+		Search for a docker image on dockerhub:
+		
+		Usage: docker search <image>
+		
+		Example: docker search ubuntu
+		
+		List docker images:
+		
+		docker image ls
+		
+		Build a Docker image:
+		
+		Usage: docker build <path>
+		
+		Example (also tags and names the build): docker build . -t org/serve:0.0.0
+		
+		Dockerfiles
+		
+		Specify a base image:
+		
+		Usage: FROM <base image>
+		
+		Example: FROM node:latest
+		
+		Set a working directory for the container:
+		
+		Usage: WORKDIR <dir>
+		
+		Example: WORKDIR /usr/src/app
+		
+		Run a command for the container image:
+		
+		Usage: RUN command
+		
+		Command: RUN npm install -g serve
+		
+		Copy files into the container:
+		
+		Usage: COPY <local files/directories> <container files/directories>
+		
+		Example: COPY ./display ./display
+		
+		Inform that a port should be exposed
+		
+		Usage: EXPOSE <port>
+		
+		Example: EXPOSE 80
+		
+		Specify a default command for the container:
+		
+		Usage (shell format): CMD <default command>
+		
+		Example: CMD serve ./display
+		
+		Usage (exec format, recommended): CMD [“default command”, “arguments”]
+		
+		Example: CMD [“node”, “server.js”]
+		
+		Cross-Container Storage
+		
+		Volumes
+		
+		Create a volume
+		
+		Usage: docker volume create <volume name>
+		
+		Example: docker volume create shared-vol
+		
+		Inspect a volume
+		
+		Usage: docker volume inspect <volume name>
+		
+		Example: docker volume inspect shared-vol
+		
+		Mount a container with a volume using docker run
+		
+		Usage: --mount source=<volume name>, target=<container dir>
+		
+		Example:
+		
+		docker run -it --name=foo --mount source=shared-vol,target=/src/shared ubuntu bash
+		
+		Bind Mounts
+		
+		Mount a container with a bind mount using docker run
+		
+		Usage: --mount type=bind source=<host dir>, target=<container dir>
+		
+		Example:
+		
+		docker run -it --name=foo --mount type=bind source=/Users/foo/bindmountdir, \
+		
+		target=/src/mountdir ubuntu bash
+		
+		Tmpfs mounts
+		
+		Mount a container with a tmpfs mount using docker run
+		
+		Usage: --mount type=tmpfs, destination=<container dir>
+		
+		Example:
+		docker run -it --name=baz --mount type=tmpfs, destination=/tmpdir ubuntu bash
+		
+		Docker Networking
+		
+		List docker networks
+		
+		docker network ls
+		
+		Inspect a docker network
+		
+		Usage: docker network inspect <network name>
+		
+		Example: docker network inspect bridge
+		
+		Create a docker network
+		
+		Usage: docker network create <network name>
+		
+		Example: docker network create privatenw
+		
+		Run a container with a custom docker network:
+		
+		Usage: --network=<network name>
+		
+		Example: docker run --network=privatenw -it --name=goo busybox
+		
+		Docker Compose
+		
+		Start a docker compose application
+		
+		At the root (where docker-compose.yml is located): docker-compose up
+		
+		Start a docker compose application and rebuild images:
+		
+		Docker-compose up --build
+		
+		docker-compose.yml
+		
+		Version
+		
+		Current version is 3. So at the top of the file, specify: version: ‘3’
+		
+		Services with builds
+		
+		Have a services key in the file. List out services one indent at a time.
+		
+		Dependencies
+		
+		Use the depends_on key and specify dependencies with a list. Each container dependency is marked by a dash, such as: -backend
+		
+		Volumes
+		
+		Have a volume key per service.
+		
+		Connect a Docker host directory to a container directory, by joining them with a colon.
+		
+		Example: ./dockerhostdir:/containerdir
+		
+		Networks
+		
+		Declare networks at the bottom of the file.
+		
+		Specify each service’s network(s) with the networks option for each service.
+		
+
+		
+		
+Docker Swarm : 
+		- it is simmer as kubernetes 
+		- it has manager and worker combination 
+		
+	- necessary open protocols for docker swarm
+	
+Docker Swarm | Summary and Commands
+		Docker Swarm | Summary and Commands
+		
+		Great work on completing this section on Docker Swarm. In this section, we covered a handful of important concepts.
+		
+		For one, we explored how with docker swarm we can have more than one machine running docker to achieve scalability and reliability. The swarm of docker-running machines implicitly sets up a fallback system where if one node goes down, another can serve customers in its place. Swarm itself also comes with built-in features such as the routing mesh and load balancing between nodes.
+		
+		Finally, here’s the summary of commands that we’ve used so far. Head to the bottom of the summary to see new notes on Docker swarm.
+		
+		Docker Containers
+		
+		Create an interactive terminal container with a name, an image, and a default command:
+		
+		Usage: docker create -it --name=<name> <image> <command>
+		
+		Example: docker create -it --name=foo ubuntu bash
+		
+		List all running containers:
+		
+		docker container ls
+		
+		(list all containers, running or not): docker container ls -a
+		
+		Start a docker container:
+		
+		Usage: docker start <container name/id>
+		
+		Example: docker start foo
+		
+		Attach to a docker container:
+		
+		Usage: docker attach <container name/id>
+		
+		Example: docker attach foo
+		
+		Remove a container:
+		
+		Usage: docker rm <container name/id>
+		
+		Example: docker rm foo
+		
+		Force remove: docker rm foo -f
+		
+		Run a new container:
+		
+		Usage: docker run <image> <command>
+		
+		Example with options: docker run --name=bar -it ubuntu bash
+		
+		Remove all containers:
+		
+		docker container ls -aq | xargs docker container rm
+		
+		Execute a command in a running container:
+		
+		Usage: docker exec <container name/id> <command>
+		
+		Example (interactive, with tty): docker exec -it express bash
+		
+		Docker Images
+		
+		Remove a docker image:
+		
+		Usage: docker image rmi <image id>
+		
+		Example (only uses first 3 characters of image id): docker rmi 70b
+		
+		Remove all images:
+		
+		docker image ls -aq | xargs docker rmi -f
+		
+		Search for a docker image on dockerhub:
+		
+		Usage: docker search <image>
+		
+		Example: docker search ubuntu
+		
+		List docker images:
+		
+		docker image ls
+		
+		Build a Docker image:
+		
+		Usage: docker build <path>
+		
+		Example (also tags and names the build): docker build . -t org/serve:0.0.0
+		
+		Dockerfiles
+		
+		Specify a base image:
+		
+		Usage: FROM <base image>
+		
+		Example: FROM node:latest
+		
+		Set a working directory for the container:
+		
+		Usage: WORKDIR <dir>
+		
+		Example: WORKDIR /usr/src/app
+		
+		Run a command for the container image:
+		
+		Usage: RUN command
+		
+		Command: RUN npm install -g serve
+		
+		Copy files into the container:
+		
+		Usage: COPY <local files/directories> <container files/directories>
+		
+		Example: COPY ./display ./display
+		
+		Inform that a port should be exposed
+		
+		Usage: EXPOSE <port>
+		
+		Example: EXPOSE 80
+		
+		Specify a default command for the container:
+		
+		Usage (shell format): CMD <default command>
+		
+		Example: CMD serve ./display
+		
+		Usage (exec format, recommended): CMD [“default command”, “arguments”]
+		
+		Example: CMD [“node”, “server.js”]
+		
+		Cross-Container Storage
+		
+		Volumes
+		
+		Create a volume
+		
+		Usage: docker volume create <volume name>
+		
+		Example: docker volume create shared-vol
+		
+		Inspect a volume
+		
+		Usage: docker volume inspect <volume name>
+		
+		Example: docker volume inspect shared-vol
+		
+		Mount a container with a volume using docker run
+		
+		Usage: --mount source=<volume name>, target=<container dir>
+		
+		Example:
+		
+		docker run -it --name=foo --mount source=shared-vol,target=/src/shared ubuntu bash
+		
+		Bind Mounts
+		
+		Mount a container with a bind mount using docker run
+		
+		Usage: --mount type=bind source=<host dir>, target=<container dir>
+		
+		Example:
+		
+		docker run -it --name=foo --mount type=bind source=/Users/foo/bindmountdir, \
+		
+		target=/src/mountdir ubuntu bash
+		
+		Tmpfs mounts
+		
+		Mount a container with a tmpfs mount using docker run
+		
+		Usage: --mount type=tmpfs, destination=<container dir>
+		
+		Example:
+		docker run -it --name=baz --mount type=tmpfs, destination=/tmpdir ubuntu bash
+		
+		Docker Networking
+		
+		List docker networks
+		
+		docker network ls
+		
+		Inspect a docker network
+		
+		Usage: docker network inspect <network name>
+		
+		Example: docker network inspect bridge
+		
+		Create a docker network
+		
+		Usage: docker network create <network name>
+		
+		Example: docker network create privatenw
+		
+		Run a container with a custom docker network:
+		
+		Usage: --network=<network name>
+		
+		Example: docker run --network=privatenw -it --name=goo busybox
+		
+		Docker Compose
+		
+		Start a docker compose application
+		
+		At the root (where docker-compose.yml is located): docker-compose up
+		
+		Start a docker compose application and rebuild images:
+		
+		Docker-compose up --build
+		
+		docker-compose.yml
+		
+		Version
+		
+		Current version is 3. So at the top of the file, specify: version: ‘3’
+		
+		Services with builds
+		
+		Have a services key in the file. List out services one indent at a time.
+		
+		Dependencies
+		
+		Use the depends_on key and specify dependencies with a list. Each container dependency is marked by a dash, such as: -backend
+		
+		Volumes
+		
+		Have a volume key per service.
+		
+		Connect a Docker host directory to a container directory, by joining them with a colon.
+		
+		Example: ./dockerhostdir:/containerdir
+		
+		Networks
+		
+		Declare networks at the bottom of the file.
+		
+		Specify each service’s network(s) with the networks option for each service.
+		
+		Docker Swarm
+		
+		Initialize a swarm in a node
+		
+		Usage: docker swarm init --advertise-addr=<node ip>
+		
+		Example: docker swarm init --advertise-addr=172.31.17.31
+		
+		After initializing the swarm, you will find a join command for worker/other manager nodes
+		
+		Example: docker swarm join --token SWMTKN-1-592fo0c31guwi9cw58jpaw89fafzyw5fzbk9dwiw8bm4xxpad-94vn587o9o3r73h3e5esujxm9 172.31.17.31:2377
+		
+		List docker nodes from a manger:
+		
+		docker node ls
+		
+		Create a service for the swarm:
+		
+		Usage: docker service create --name=<service name> --publish=<host port:service port> <service image>
+		
+		Example: docker service create --name=site --publish=80:80 nginx
+		
+		List services:
+		
+		docker service ls
+		
+		List the running tasks for a service:
+		
+		Usage: docker service ps <service name>
+		
+		Example: docker service ps site
+		
+		Update a service
+		
+		Usage: docker service update [options] <service name>
+		
+		Example: docker service update --replicas=6 site
+	
+aws CLI 	 :
+	- curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+		unzip awscliv2.zip
+		sudo ./aws/install
+	
+	- curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+		unzip awscliv2.zip
+		sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+		
+
+	
+	aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m5j6t1v5
+	
+	docker tag ajaycodehelper/ajay-continues-php-image:latest public.ecr.aws/m5j6t1v5/ajaycodehelper/ajay-continues-php-image:latest
+	
+	docker push public.ecr.aws/m5j6t1v5/ajaycodehelper/ajay-continues-php-image:latest
+	
+- Docker and Continuous Deployment
+	Docker and Continuous Deployment | Summary and Commands
+	
+	We just explored how to set up development operations workflows with docker, github actions, and amazon ECR. This is only the beginning of a continuous deployment workflow. In the industry, larger engineering organizations implement multiple workflows to power their continuous deployment practices. These may be testing steps, to determine whether or not an image should even be deployed. Or they could be separate workflows to publish to additional registries, or testing/production environments for the product.
+	
+	We’ve reached the end of the course. In the next section, you’ll find an optional reference section where you can deepen your knowledge of some topics that appeared in the course, such as JavaScript. Finally, check out the congratulatory material in the final section of the course!
+	
+	Once you’ve completed all videos, you can also receive your certificate of completion from udemy.
+	
+	Here’s the overall summary of major commands we’ve used with Docker so far:
+	
+	Docker Containers
+	
+	Create an interactive terminal container with a name, an image, and a default command:
+	
+	Usage: docker create -it --name=<name> <image> <command>
+	
+	Example: docker create -it --name=foo ubuntu bash
+	
+	List all running containers:
+	
+	docker container ls
+	
+	(list all containers, running or not): docker container ls -a
+	
+	Start a docker container:
+	
+	Usage: docker start <container name/id>
+	
+	Example: docker start foo
+	
+	Attach to a docker container:
+	
+	Usage: docker attach <container name/id>
+	
+	Example: docker attach foo
+	
+	Remove a container:
+	
+	Usage: docker rm <container name/id>
+	
+	Example: docker rm foo
+	
+	Force remove: docker rm foo -f
+	
+	Run a new container:
+	
+	Usage: docker run <image> <command>
+	
+	Example with options: docker run --name=bar -it ubuntu bash
+	
+	Remove all containers:
+	
+	docker container ls -aq | xargs docker container rm
+	
+	Execute a command in a running container:
+	
+	Usage: docker exec <container name/id> <command>
+	
+	Example (interactive, with tty): docker exec -it express bash
+	
+	
+	
+	Docker Images
+	
+	Remove a docker image:
+	
+	Usage: docker image rmi <image id>
+	
+	Example (only uses first 3 characters of image id): docker rmi 70b
+	
+	Remove all images:
+	
+	docker image ls -aq | xargs docker rmi -f
+	
+	Search for a docker image on dockerhub:
+	
+	Usage: docker search <image>
+	
+	Example: docker search ubuntu
+	
+	List docker images:
+	
+	docker image ls
+	
+	Build a Docker image:
+	
+	Usage: docker build <path>
+	
+	Example (also tags and names the build): docker build . -t org/serve:0.0.0
+	
+	
+	
+	Dockerfiles
+	
+	Specify a base image:
+	
+	Usage: FROM <base image>
+	
+	Example: FROM node:latest
+	
+	Set a working directory for the container:
+	
+	Usage: WORKDIR <dir>
+	
+	Example: WORKDIR /usr/src/app
+	
+	Run a command for the container image:
+	
+	Usage: RUN command
+	
+	Command: RUN npm install -g serve
+	
+	Copy files into the container:
+	
+	Usage: COPY <local files/directories> <container files/directories>
+	
+	Example: COPY ./display ./display
+	
+	Inform that a port should be exposed
+	
+	Usage: EXPOSE <port>
+	
+	Example: EXPOSE 80
+	
+	Specify a default command for the container:
+	
+	Usage (shell format): CMD <default command>
+	
+	Example: CMD serve ./display
+	
+	Usage (exec format, recommended): CMD [“default command”, “arguments”]
+	
+	Example: CMD [“node”, “server.js”]
+	
+	
+	
+	Cross-Container Storage
+	
+	Volumes
+	
+	Create a volume
+	
+	Usage: docker volume create <volume name>
+	
+	Example: docker volume create shared-vol
+	
+	Inspect a volume
+	
+	Usage: docker volume inspect <volume name>
+	
+	Example: docker volume inspect shared-vol
+	
+	Mount a container with a volume using docker run
+	
+	Usage: --mount source=<volume name>, target=<container dir>
+	
+	Example:
+	
+	docker run -it --name=foo --mount source=shared-vol,target=/src/shared ubuntu bash
+	
+	Bind Mounts
+	
+	Mount a container with a bind mount using docker run
+	
+	Usage: --mount type=bind source=<host dir>, target=<container dir>
+	
+	Example:
+	
+	docker run -it --name=foo --mount type=bind source=/Users/foo/bindmountdir, \
+	
+	target=/src/mountdir ubuntu bash
+	
+	Tmpfs mounts
+	
+	Mount a container with a tmpfs mount using docker run
+	
+	Usage: --mount type=tmpfs, destination=<container dir>
+	
+	Example:
+	docker run -it --name=baz --mount type=tmpfs, destination=/tmpdir ubuntu bash
+	
+	Docker Networking
+	
+	List docker networks
+	
+	docker network ls
+	
+	Inspect a docker network
+	
+	Usage: docker network inspect <network name>
+	
+	Example: docker network inspect bridge
+	
+	Create a docker network
+	
+	Usage: docker network create <network name>
+	
+	Example: docker network create privatenw
+	
+	Run a container with a custom docker network:
+	
+	Usage: --network=<network name>
+	
+	Example: docker run --network=privatenw -it --name=goo busybox
+	
+	
+	
+	Docker Compose
+	
+	Start a compose application
+	
+	At the root (where docker-compose.yml is located): docker-compose up
+	
+	Start a compose application and rebuild images:
+	
+	Docker-compose up --build
+	
+	
+	
+	docker-compose.yml
+	
+	Version
+	
+	Current version is 3. So at the top of the file, specify: version: ‘3’
+	
+	Services with builds
+	
+	Have a services key in the file. List out services one indent at a time.
+	
+	Dependencies
+	
+	Use the depends_on key and specify dependencies with a list. Each container dependency is marked by a dash, such as: -backend
+	
+	Volumes
+	
+	Have a volume key per service.
+	
+	Connect a Docker host directory to a container directory, by joining them with a colon.
+	
+	Example: ./dockerhostdir:/containerdir
+	
+	Networks
+	
+	Declare networks at the bottom of the file.
+	
+	Specify each service’s network(s) with the networks option for each service.
+	
+	
+	
+	Docker Swarm
+	
+	Initialize a swarm in a node
+	
+	Usage: docker swarm init --advertise-addr=<node ip>
+	
+	Example: docker swarm init --advertise-addr=172.31.17.31
+	
+	After initializing the swarm, you will find a join command for worker/other manager nodes
+	
+	Example: docker swarm join --token SWMTKN-1-592fo0c31guwi9cw58jpaw89fafzyw5fzbk9dwiw8bm4xxpad-94vn587o9o3r73h3e5esujxm9 172.31.17.31:2377
+	
+	List docker nodes from a manger:
+	
+	docker node ls
+	
+	Create a service for the swarm:
+	
+	Usage: docker service create --name=<service name> --publish=<host port:service port> <service image>
+	
+	Example: docker service create --name=site --publish=80:80 nginx
+	
+	List services:
+	
+	docker service ls
+	
+	List the running tasks for a service:
+	
+	Usage: docker service ps <service name>
+	
+	Example: docker service ps site
+	
+	Update a service
+	
+	Usage: docker service update [options] <service name>
+	
+	Example: docker service update --replicas=6 site

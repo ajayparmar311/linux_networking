@@ -1,0 +1,341 @@
+Here are the commands executed in the next steps. Please refer back to them if you have any problems.
+
+gcloud config set project glowing-furnace-304608
+gcloud pubsub topics create topic-from-gcloud
+gcloud pubsub subscriptions create subscription-gcloud-1 --topic=topic-from-gcloud
+gcloud pubsub subscriptions create subscription-gcloud-2 --topic=topic-from-gcloud
+gcloud pubsub subscriptions pull subscription-gcloud-2
+gcloud pubsub subscriptions pull subscription-gcloud-1
+gcloud pubsub topics publish topic-from-gcloud --message="My First Message"
+gcloud pubsub topics publish topic-from-gcloud --message="My Second Message"
+gcloud pubsub topics publish topic-from-gcloud --message="My Third Message"
+gcloud pubsub subscriptions pull subscription-gcloud-1 --auto-ack
+gcloud pubsub subscriptions pull subscription-gcloud-2 --auto-ack
+gcloud pubsub topics list
+gcloud pubsub topics delete topic-from-gcloud
+gcloud pubsub topics list-subscriptions my-first-topic
+
+
+create google_project_iam_member for service account token creator role
+steps to create terraform file for pub/sub topic and push subscription  for GCP  along with oidc token and im permitions
+
+Here are the commands executed in the next steps. Please refer back to them if you have any problems.
+
+
+
+gcloud compute project-info describe
+gcloud auth list
+gcloud projects get-iam-policy glowing-furnace-304608
+gcloud projects add-iam-policy-binding glowing-furnace-304608 --member=user:in28minutes@gmail.com --role=roles/storage.objectAdmin
+gcloud projects remove-iam-policy-binding glowing-furnace-304608 --member=user:in28minutes@gmail.com --role=roles/storage.objectAdmin
+gcloud iam roles describe roles/storage.objectAdmin
+gcloud iam roles copy --source=roles/storage.objectAdmin --destination=my.custom.role --dest-project=glowing-furnace-304608
+
+- 5 characteristic of cloud computing
+	- On-Demand self service
+	- broad network access
+	- resource pooling
+	- rapid elasticity
+	- measured service
+
+- capEx : Capital Expense
+	- Making upfront investment for future use / profit
+	
+- OpEx : Operating Expense
+	- pay for what you actually use
+	
+- Type  of Cloud Services 
+	- IaaS : computer,networking,storage etc (ex: vertual machine)
+	
+	- PaaS : Compute, networking, storage, runtime environment,scaling, redundancy, 	security, updates, patching, maintenance etc. (Ex. web apps)
+	
+	- SaaS : office365,salesforce
+	
+	- FaaS – Functions as a Service
+	- DBaaS – Database as a Service
+	- DaaS – Desktop as a Service
+	- IOTaaS – IOT as a Service
+	- AIaaS – AI as a Service
+	
+- type of cloud : 
+	- public
+	- private : vmware cloud , redhat openshift container platform , azure stack
+	- hybrid : azure arc , aws outposts
+	
+- GCP services : https://cloud.google.com/products
+		
+	
+
+- we can use committed use discounts for discounts when we want dedicated hardware for long 1 to 3 year committed time.
+- Or we can use preemtible instance for foult tolerance this are short-lived cheaper compute instance for time-critical fault tolerant workloads 
+- we can create Sole-tenant nodes for non shared resources
+
+
+CI for GCP : 
+	- gcloud
+	- gsutil : cloud storage
+	- bq : cloud bigquery
+	- cbt : cloud bigtable
+	- kubectl : kubernetes
+
+- gcloud commands : 
+	- gcloud <GROUP> <SUBGROUP> <ACTION.....>
+	- gcloud config list project
+	- gcloud config set --help
+ 	- gcloud config set <SECTION>/<PROPERTY> <VALUE>
+		 - gcloud config set core/account <value>  			# to set aaccount value we can use this to update any value 
+	- gcloud config unset <SECTION>/<PROPERTY>				# to unset properties
+				
+	- gcloud config configurations list						# to list exisiting configuration
+	- gcloud config configurations create <configuration name>						# to create new configuration
+	- gcloud config configurations activate my-default-configuration
+	- gcloud config list
+	- gcloud config configurations describe my-second-configuration
+	- gcloud compute instances list
+	- gcloud compute instances create
+	- gcloud compute instances create my-first-instance-from-gcloud
+	- gcloud compute instances describe my-first-instance-from-gcloud
+	- gcloud compute instances delete my-first-instance-from-gcloud
+	- gcloud compute zones list
+	- gcloud compute regions list
+	- gcloud compute machine-types list
+	- gcloud compute machine-types list --filter zone:asia-southeast2-b
+	- gcloud compute machine-types list --filter "zone:(asia-southeast2-b asia-southeast2-c)"
+	- gcloud compute zones list --filter=region:us-west2
+	- gcloud compute zones list --sort-by=region
+	- gcloud compute zones list --sort-by=~region   # reverse sort
+	- gcloud compute zones list --uri
+	- gcloud compute regions describe us-west4
+	- gcloud compute instance-templates list
+	- gcloud compute instance-templates create instance-template-from-command-line
+	- gcloud compute instance-templates delete instance-template-from-command-line
+	- gcloud compute instance-templates describe my-instance-template-with-custom-image
+	
+- So instead of just providing the name of the template we need to provide the complete name along with region details
+
+	- gcloud compute instances create my-test-vm --source-instance-template=projects/<<project-name>>/regions/<<region-name>>/my-instance-template-with-custom-image
+
+- So if your project name is just-lore-1234 and your region is us-central1 the command should be
+	- gcloud compute instances create my-test-vm --source-instance-template=projects/just-lore-1234/regions/us-central1/my-instance-template-with-custom-image
+	- gcloud compute instance-groups managed create \
+        example-managed-instance-group --zone=us-central1-c \
+        --template=my-first-instance-template --size=1
+	
+	
+	
+	- gcloud compute instances create my-test-vm --source-instance-template=my-instance-template-with-custom-image
+	- gcloud compute instance-groups managed list
+	- gcloud compute instance-groups managed delete my-managed-instance-group
+	- gcloud compute instance-groups managed create my-mig --zone us-central1-a --template my-instance-template-with-custom-image --size 1
+	- gcloud compute instance-groups managed set-autoscaling my-mig --max-num-replicas=2 --zone us-central1-a
+	- gcloud compute instance-groups managed stop-autoscaling my-mig --zone us-central1-a
+	- gcloud compute instance-groups managed resize my-mig --size=1 --zone=us-central1-a
+	- gcloud compute instance-groups managed recreate-instances my-mig --instances=my-mig-85fb --zone us-central1-a
+	- gcloud compute instance-groups managed delete my-managed-instance-group --region=us-central1
+	
+	
+	
+- cd default-service
+	- gcloud app create --region=us-central
+	- gcloud app deploy
+	- gcloud app services browse/delete/describe/list/set-traffic
+	- gcloud app versions browse/delete/describe/list/migrate/start/stop
+	- gcloud app instances delete/describe/list/scp/ssh
+	- gcloud app deploy --version=v2
+	- gcloud app versions list
+	- gcloud app browse
+	- gcloud app browse --version 20210215t072907
+	- gcloud app deploy --version=v3 --no-promote			# deploy app without promoting traffic to it.
+	- gcloud app browse --version v3
+	- gcloud app services set-traffic splits=v3=.5,v2=.5 	# split traffic by IP (if taffic comes from single ip it will not split)
+	- watch curl https://melodic-furnace-304906.uc.r.appspot.com/
+	- gcloud app services set-traffic --splits=v3=.5,v2=.5 --split-by=random  # split traffic from random IP
+
+	- cd ../my-first-service/
+	- gcloud app deploy
+	- gcloud app browse --service=my-first-service
+	- 
+	- gcloud app services list
+	- gcloud app regions list  
+	- 
+	- gcloud app browse --service=my-first-service --version=20210215t075851
+	- gcloud app browse --version=v2
+	- gcloud app open-console --version=v2
+	- gcloud app versions list --hide-no-traffic
+	- gcloud app versions migrate v2 --service="myService"
+	- gcloud app versions start/stop <versionid>
+	
+	- dispatch.yaml : Override routing rules (gcloud app deploy dispatch.yaml)
+		dispatch:
+			- url: "*/mobile/*"
+			  service: mobile-frontend
+			- url: "*/work/*"
+			  service: static-backend
+	
+	- cron job yaml (gcloud app deply cron.yaml)
+		cron:
+			- description: "daily summary job"
+			  uri: /tasks/summary
+			  schedule: every 24 hours
+			  
+	- App engin is region specific we can not change resone after creating.also one project can have only one app engin application but can have multiple services into it.
+	
+
+--  Kubernetes commands : 
+	- gcloud config set project my-kubernetes-project-304910
+	- gcloud container clusters get-credentials my-cluster --zone us-central1-c --project my-kubernetes-project-304910
+	- gcloud projects list
+	- gcloud container clusters update <cluser-name> --enable-autoscale --min-node=1 --max-node=10
+	- gcloud container clusters delete my-cluster --zone us-central1-c
+	- gcloud container images list
+	- gcloud container node-pools list --zone=us-central1-c --cluster=my-cluster
+	- gcloud container clusters resize my-cluster --node-pool default-pool --num-nodes=2 --zone=us-central1-c
+	
+	
+ - kubectl commands: 	
+	- kubectl create deployment hello-world-rest-api --image=in28min/hello-world-rest-api:0.0.1.RELEASE
+	- kubectl get deployment
+	- kubectl expose deployment hello-world-rest-api --type=LoadBalancer --port=8080
+	- kubectl get services
+	- kubectl get services --watch
+	- curl 35.184.204.214:8080/hello-world
+	- kubectl scale deployment hello-world-rest-api --replicas=3
+	- kubectl autoscale deployment hello-world-rest-api --max=4 --cpu-percent=70
+	- kubectl get hpa
+	- kubectl create configmap hello-world-config --from-literal=RDS_DB_NAME=todos
+	- kubectl get configmap
+	- kubectl describe configmap hello-world-config
+	- kubectl create secret generic hello-world-secrets-1 --from-literal=RDS_PASSWORD=dummytodos
+	- kubectl get secret
+	- kubectl describe secret hello-world-secrets-1
+	- kubectl apply -f deployment.yaml
+	- kubectl get pods -o wide
+	- kubectl set image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE
+	- kubectl get services
+	- kubectl get replicasets
+	- kubectl get pods
+	- kubectl delete pod hello-world-rest-api-58dc9d7fcc-8pv7r
+	- kubectl scale deployment hello-world-rest-api --replicas=1
+	- kubectl get replicasets
+	- kubectl delete service hello-world-rest-api
+	- kubectl delete deployment hello-world-rest-api
+	- kubectl rollout undo deployment <deployment name> --to-revision=1
+
+
+- cloud run :
+	- gcloud run deploy <SERVICE-NAME> --image <IMAGE-URL> --revision-suffix v1
+	- gcloud run revisions list
+	- gcloud run services update-traffic <SERVICE-NAME> --to-revision=v2=10,v=90
+	
+- cloud storage
+	- gcloud compute disks list/create/delete/resize/snapshot
+	- gcloud compute images list/create/delete/deprecate/describe/export/import/update
+	
+- cloud storage buckets:
+	- gsutil : cli tool used to manage cloud storage buckets
+	- gsutil mb gs://<BUCKET-NAME>		// create CSB
+	- gsutil ls -a gs://<BUCKET-NAME>  	// list current and non current object versions
+	- gsutil cp gs://<SOURCE-BUCKET-NAME>/OBJECT gs://<DESTINATION-BUCKET-NAME>/OBJECT 	// COPY OBJECT
+	- gsutil cp <LOCAL-LOCATION> gs://<DESTINATION-BUCKET-NAME>/OBJECT 	// COPY OBJECT
+	- gsutil cp gs://<SOURCE-BUCKET-NAME>/OBJECT <LOCAL-LOCATION> 	// COPY OBJECT
+	- gsutil mv gs://<SOURCE-BUCKET-NAME>/OBJECT gs://<DESTINATION-BUCKET-NAME>/OBJECT
+	- gsutil mv gs://<SOURCE-BUCKET-NAME>/OBJECT gs://<SOURCE-BUCKET-NAME>/RENAME-OBJECT
+	- gsutil rewrite -s <STORAGE-CLASS> gs://<BUCKET-NAME>/OBJECT  // to change storage class for object
+	- gsutil signurl -d 10m <YOUR-KEY> gs://<BUCKET-NAME>/OBJECT
+	
+- IAM 
+	- gcloud compute project-info describe		// describe current project
+	- gcloud auth list						// list active account
+	- gcloud projects get-iam-policy <projectid>
+	- gcloud projects add-iam-policy-binding <projectid> --member=user:in28minutes@gmail.com --role=roles/storage.objectAdmin
+	- gcloud projects remove-iam-policy-binding <projectid> --member=user:in28minutes@gmail.com --role=roles/storage.objectAdmin
+	- gcloud iam roles describe roles/storage.objectAdmin
+	- gcloud iam roles copy --source=roles/storage.objectAdmin --destination=my.custom.role --dest-project=glowing-furnace-304608
+	- gcloud iam service-accounts keys create
+	
+- To create signed URL : 
+	- 1 create a key for the service account/user with desired permissions
+	- 2 create signed URL with the key : 
+		- gsutil signurl -d 10m <YOUR_KEY> gs://bucket-name/object-path
+		
+- database in GCP : 
+	- relational OLTP database :
+		- cloud sql
+		- cloud spanner
+	- relational OLAP database :
+		- bigquery
+	- noSQL databases : schema-less
+		- cloud firestore : serverless transectional document DB, support mobile and web apps,small ro mediam DB
+		- cloud bigtable : large databses , streaming(IOT,analytical and operational workloads, not serverless
+	- in memory databases : 
+		- cloud memorystore : application needing microsecond response
+		
+		
+# Cloud SQL
+ 	- gcloud sql connect my-first-cloud-sql-instance --user=root --quiet
+ 	- gcloud config set project glowing-furnace-304608
+ 	- gcloud sql connect my-first-cloud-sql-instance --user=root --quiet
+ - use todos
+ 	- create table user (id integer, username varchar(30) );
+ 	- describe user;
+ 	- insert into user values (1, 'Ranga');
+ 	- select * from user;
+ 
+ - # Cloud Spanner
+ 	 CREATE TABLE Users (
+ 	 UserId   INT64 NOT NULL,
+ 	 UserName  STRING(1024)
+ 	 ) PRIMARY KEY(UserId);
+ 	 
+ 	 
+ - # Cloud BigTable
+	- bq show bigquery-public-data:samples.shakespeare
+	- gcloud --version
+	- cbt listinstances -project=glowing-furnace-304608
+	- echo project = glowing-furnace-304608 > ~/.cbtrc
+	- cat ~/.cbtrc
+	- cbt listinstances
+	
+	
+	
+	wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+	- gcloud auth application-default login
+		Credentials saved to file: [C:\Users\Indian\AppData\Roaming\gcloud\application_default_credentials.json]
+
+		These credentials will be used by any library that requests Application Default Credentials (ADC).
+		
+		Quota project "my-kube-project-429018" was added to ADC which can be used by Google client libraries for billing and quota. Note that some services may still bill the project owning the resource.
+		
+	- gcloud auth application-default revoke
+	
+	
+- Database: 
+	- Types of NoSQL Databases:
+		- Key-Value Stores:
+		
+			- Example: Redis, DynamoDB
+			- Use Cases: Caching, session management, real-time data processing.
+			- Structure: Data is stored as a collection of key-value pairs, where each key is unique and points to a specific value, which can be a string, list, set, or other data structures.
+			
+		- Document Stores:
+			- Example: MongoDB, CouchDB
+			- Use Cases: Content management systems, e-commerce applications, user profiles.
+			- Structure: Data is stored as documents, typically in JSON or BSON format. Each document can contain nested structures, making it easy to represent complex data.
+			
+		- Column-Family Stores:
+			- Example: Apache Cassandra, HBase
+			- Use Cases: Time-series data, real-time analytics, recommendation engines.
+			- Structure: Data is stored in columns instead of rows. Columns are grouped into column families, and each row can have a different number of columns.
+			
+		- Graph Databases:
+			- Example: Neo4j, Amazon Neptune
+			- Use Cases: Social networks, fraud detection, recommendation systems.
+			- Structure: Data is stored as nodes and edges, where nodes represent entities, and edges represent relationships between them. This structure is ideal for handling highly interconnected data.
+			
+- VPC : 
+	- CIDR : classless inter-Domain Routing blockes
+		- example : 10.10.20.0/28
+	
+	- firewall : configure firewall rulesto control traffic going in ot out of the network : If the rule set to let the traffic in then it will automatically take the traffic out.
+		- firewall is stateful
+		- firewall rules has priority (0-65535) assign  to it where 0 has highest priority and 65535 is the lowest
