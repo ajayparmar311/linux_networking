@@ -65,7 +65,6 @@ git log --name-only 	# to check file name
 git log --oneline		# show details in one line
 git log --graph --decorate	
 
-
 git branch <branch name> 		# to create a branch
 git checkout <branch name>		# to switch to a branch 
 git checkout -b <branch name> 	# to create branch and swich to that branch 
