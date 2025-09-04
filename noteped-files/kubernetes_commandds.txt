@@ -102,7 +102,8 @@ ETCD
 kube scheduler
 controller-manager
 Node-controller
-Replication-controller ]
+Replication-controller 
+	]
 
 Worker node:
 
@@ -527,7 +528,7 @@ spec:
     app: myapp				## lables from deployment
 	type: front-end			## lables from deployment
 
-##### YML file for service node port #####	  
+##### YML file for load balancer service #####	  
 apiVersion: v1
 kind: Service
 metadata:

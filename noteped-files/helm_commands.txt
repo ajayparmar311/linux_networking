@@ -60,6 +60,7 @@
 	
 	9 start Minikube with docker as HW,
 		minikube start --driver=docker
+		sudo minikube start --driver=docker --force
 	
 	9 After successful start , You can check the status of the cluster:
 		minikube status
